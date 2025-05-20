@@ -29,7 +29,6 @@ jobs:
 
     - name: "ACME Profile - Setup a2c with xca_ca_handler"
       run: |
-        sudo mkdir -p examples/Docker/data
         sudo cp .github/acme2certifier.pem examples/Docker/data/acme2certifier.pem
         sudo cp .github/acme2certifier_cert.pem examples/Docker/data/acme2certifier_cert.pem
         sudo cp .github/acme2certifier_key.pem examples/Docker/data/acme2certifier_key.pem
@@ -49,7 +48,6 @@ jobs:
         sudo echo "ca_cert_chain_list: [\"root-ca\"]" >> examples/Docker/data/acme_srv.cfg
         sudo echo "template_name: $XCA_TEMPLATE" >> examples/Docker/data/acme_srv.cfg
         sudo sed -i "s/tnauthlist_support: False/tnauthlist_support: False\nprofiles={\"acme\": \"http:\/\/foo.bar\/profile1\", \"profile2\": \"http:\/\/foo.bar\/profile2\", \"profile3\": \"http:\/\/foo.bar\/profile3\"}/g" examples/Docker/data/acme_srv.cfg
-        exit 1
         cd examples/Docker/
         docker-compose restart
       env:
