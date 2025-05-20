@@ -21,11 +21,11 @@ jobs:
     - name: "checkout GIT"
       uses: actions/checkout@v4
 
-    #- name: "Build container"
-    #  uses: ./.github/actions/container_prep
-    #  with:
-    #    DB_HANDLER: ${{ matrix.dbhandler }}
-    #    WEB_SRV: ${{ matrix.websrv }}
+    - name: "Build container"
+      uses: ./.github/actions/container_prep
+      with:
+        DB_HANDLER: ${{ matrix.dbhandler }}
+        WEB_SRV: ${{ matrix.websrv }}
 
     - name: "ACME Profile - Setup a2c with xca_ca_handler"
       run: |
@@ -58,8 +58,8 @@ jobs:
         XCA_TEMPLATE: ${{ secrets.XCA_TEMPLATE }}
         XCA_DB_NAME: ${{ secrets.XCA_DB_NAME }}
 
-    - name: "Header-info - enrollment"
-      uses: ./.github/actions/wf_specific/xca_ca_handler/enroll_headerinfo
+    - name: "ACME Profile - enrollment"
+      uses: ./.github/actions/wf_specific/xca_ca_handler/enroll_acmeprofile
 
 
     - name: "[ * ] collecting test logs"
