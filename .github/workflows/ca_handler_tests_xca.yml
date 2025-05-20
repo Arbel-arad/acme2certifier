@@ -104,7 +104,7 @@ jobs:
         XCA_DB_NAME: ${{ secrets.XCA_DB_NAME }}
 
     - name: "EAB ACME Profile - enrollment"
-      uses: ./.github/actions/wf_specific/xca_ca_handler/enroll_acmeprofile
+      uses: ./.github/actions/wf_specific/xca_ca_handler/enroll_eab_acmeprofile
 
     - name: "[ * ] collecting test logs"
       if: ${{ failure() }}
