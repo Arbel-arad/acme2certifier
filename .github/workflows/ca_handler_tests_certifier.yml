@@ -134,7 +134,7 @@ jobs:
         NCM_CA_NAME: ${{ secrets.NCM_CA_NAME }}
         NCM_CA_BUNDLE: ${{ secrets.NCM_CA_BUNDLE }}
 
-    - name: "ACME Profile - Enrollment"
+    - name: "EAB ACME Profile - Enrollment"
       uses: ./.github/actions/wf_specific/certifier_ca_handler/enroll_eab_w_acmeprofile
 
 
