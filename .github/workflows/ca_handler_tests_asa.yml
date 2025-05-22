@@ -34,6 +34,42 @@ jobs:
         mkdir lego
         mkdir acme-sh
 
+    - name: "Profile ${{ secrets.ASA_PROFILE1 }} - Setup a2c with asa_ca_handler with profile ${{ secrets.ASA_PROFILE1 }}"
+      run: |
+        mkdir -p data/acme_ca
+        sudo cp test/ca/certsrv_ca_certs.pem data/acme_ca/ca_certs.pem
+        sudo touch data/acme_srv.cfg
+        sudo chmod 777 data/acme_srv.cfg
+        sudo head -n -8 .github/openssl_ca_handler.py_acme_srv_default_handler.cfg > data/acme_srv.cfg
+        sudo echo "handler_file: examples/ca_handler/asa_ca_handler.py" >> data/acme_srv.cfg
+        sudo echo "api_host: $ASA_API_HOST" >> data/acme_srv.cfg
+        sudo echo "api_user: $ASA_API_USER" >> data/acme_srv.cfg
+        sudo echo "api_password: $ASA_API_PASSWORD" >> data/acme_srv.cfg
+        sudo echo "api_key: $ASA_API_KEY" >> data/acme_srv.cfg
+        sudo echo "ca_name: $ASA_CA_NAME" >> data/acme_srv.cfg
+        sudo echo "ca_bundle: $ASA_CA_BUNDLE" >> data/acme_srv.cfg
+        sudo echo "profile_name: $ASA_PROFILE1" >> data/acme_srv.cfg
+        sudo sed -i "s/revocation_reason_check_disable: False/revocation_reason_check_disable: False\nenrollment_timeout:15/g" data/acme_srv.cfg
+        sudo echo "allowed_domainlist: [\"bar.local\", \"*.acme\"]" >> data/acme_srv.cfg
+      env:
+        ASA_API_HOST: ${{ secrets.ASA_API_HOST }}
+        ASA_API_USER: ${{ secrets.ASA_API_USER }}
+        ASA_API_PASSWORD: ${{ secrets.ASA_API_PASSWORD }}
+        ASA_API_KEY: ${{ secrets.ASA_API_KEY }}
+        ASA_CA_NAME: ${{ secrets.ASA_CA_NAME }}
+        ASA_CA_BUNDLE: ${{ secrets.ASA_CA_BUNDLE }}
+        ASA_PROFILE1: ${{ secrets.ASA_PROFILE1 }}
+
+    - name: "Profile ${{ secrets.ASA_PROFILE1 }} - Execute install scipt"
+      run: |
+        docker exec acme-srv sh /tmp/acme2certifier/rpm_tester.sh
+
+    - name: "${{ secrets.ASA_PROFILE1 }} - enrollment"
+      uses: ./.github/actions/wf_specific/asa_ca_handler/enroll_profile_1
+      with:
+        PROFILE: ${{ secrets.ASA_PROFILE1 }}
+
+
     - name: "ACME Profile - Setup asa_ca_handler with headerinfo"
       run: |
         sudo touch data/acme_srv.cfg
