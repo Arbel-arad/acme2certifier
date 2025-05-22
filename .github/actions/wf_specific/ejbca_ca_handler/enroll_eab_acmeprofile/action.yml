@@ -21,7 +21,7 @@ runs:
     shell: bash
 
   - name: "EAB wit headerinfo - Test if https://acme-srv/directory is accessible"
-    run: docker run -i --rm --networkEAB ACME Profilecme curlimages/curl --insecure -f https://acme-srv/directory
+    run: docker run -i --rm --network acme curlimages/curl --insecure -f https://acme-srv/directory
     shell: bash
 
   - name: "EAB ACME Profile - 01a - enrollment without profile (first value in list)"
