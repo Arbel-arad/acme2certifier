@@ -65,7 +65,7 @@ jobs:
     - name: "${{ secrets.ASA_PROFILE1 }} - enrollment"
       uses: ./.github/actions/wf_specific/asa_ca_handler/enroll_profile_1
 
-    - name: "ACME Profile - Setup asa_ca_handler with headerinfo"
+    - name: "ACME Profile - Setup asa_ca_handler"
       run: |
         sudo cp .github/openssl_ca_handler.py_acme_srv_default_handler.cfg examples/Docker/data/acme_srv.cfg
         sudo chmod 777 examples/Docker/data/acme_srv.cfg
@@ -149,6 +149,7 @@ jobs:
       with:
         ASA_CA_NAME1: ${{ secrets.ASA_CA_NAME }}
         ASA_CA_NAME2: ${{ secrets.ASA_CA_NAME2 }}
+        ASA_PROFILE1: ${{ secrets.ASA_PROFILE1 }}
 
     - name: "Check container configuration"
       uses: ./.github/actions/container_check
