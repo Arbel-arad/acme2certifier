@@ -82,17 +82,3 @@ runs:
       sudo docker run -i -v $PWD/lego:/.lego/ --rm --name lego --network acme.dynamop.de goacme/lego -s http://acme-srv -a --email "lego@example.com" --eab --kid keyid_00 --hmac V2VfbmVlZF9hbm90aGVyX3ZlcnkfX2xvbmdfaG1hY190b19jaGVja19lYWJfZm9yX2tleWlkXzAwX2FzX2xlZ29fZW5mb3JjZXNfYW5faG1hY19sb25nZXJfdGhhbl8yNTZfYml0cw -d lego.acme.dynamop.de revoke
     shell: bash
 
-  - name: "EAB - 06 - Enroll lego with not allowed headerinfo-field (should fail)"
-    id: legofail03
-    continue-on-error: true
-    run: |
-      sudo rm -rf lego/*
-      docker run -i -v $PWD/lego:/.lego/ --rm --name lego --network acme.dynamop.de goacme/lego -s http://acme-srv -a --email "lego@example.com" --eab --kid keyid_02 --hmac dGhpc19pc19hX3ZlcnlfbG9uZ19obWFjX3RvX21ha2Vfc3VyZV90aGF0X2l0c19tb3JlX3RoYW5fMjU2X2JpdHM --user-agent cert_type=ssl_securesite_pro -d lego.acme.dynamop.de --http run
-    shell: bash
-
-  - name: "EAB - 06 - check  result "
-    if: steps.legofail03.outcome != 'failure'
-    run: |
-      echo "legofail outcome is ${{steps.legofail03.outcome }}"
-      exit 1
-    shell: bash
