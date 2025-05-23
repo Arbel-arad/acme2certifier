@@ -2,7 +2,7 @@ name: CA handler Tests - Digicert CertCentral
 
 on:
   push:
-    branches: [ 'devel', 'master']
+    branches: [ 'devel', 'master' , 'profile_wf']
   pull_request:
     branches: [ devel ]
   schedule:
@@ -100,7 +100,7 @@ jobs:
         DIGICERT_ORGNAME: ${{ secrets.DIGICERT_ORGNAME }}
         DIGICERT_DOMAIN: ${{ secrets.DIGICERT_DOMAIN }}
 
-    - name: "EAB ACME Profile  - Test enrollment"
+    - name: "EAB ACME Profile - Test enrollment"
       uses: ./.github/actions/wf_specific/digicert_ca_handler/enroll_eab_acmeprofile
 
     - name: "Check container configuration"
