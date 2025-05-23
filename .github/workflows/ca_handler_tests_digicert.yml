@@ -386,6 +386,8 @@ jobs:
     - name: "Reconfigure a2c"
       run: |
         docker exec acme-srv sh /tmp/acme2certifier/$EXEC_SCRIPT  restart
+      env:
+        EXEC_SCRIPT: ${{ matrix.execscript }}
 
     - name: "EAB - Test enrollment"
       uses: ./.github/actions/wf_specific/digicert_ca_handler/enroll_acmeprofile
