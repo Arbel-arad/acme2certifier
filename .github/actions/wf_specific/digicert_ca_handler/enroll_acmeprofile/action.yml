@@ -22,7 +22,6 @@ runs:
     run: docker run -i --rm --network acme.dynamop.de curlimages/curl --insecure -f https://acme-srv/directory
     shell: bash
 
-
   - name: "ACME Profile - 01 - Enroll lego with without template"
     run: |
       sudo rm -rf lego/*
