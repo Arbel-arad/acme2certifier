@@ -83,6 +83,7 @@ jobs:
         sudo echo -e "\n\n[EABhandler]" >> examples/Docker/data/acme_srv.cfg
         sudo echo "eab_handler_file: /var/www/acme2certifier/examples/eab_handler/kid_profile_handler.py" >> examples/Docker/data/acme_srv.cfg
         sudo echo "key_file: volume/kid_profiles.json" >> examples/Docker/data/acme_srv.cfg
+        sudo echo "enrollment_config_log: True" >> examples/Docker/data/acme_srv.cfg
 
         sudo cp examples/eab_handler/kid_profiles.json examples/Docker/data/kid_profiles.json
         sudo chmod 777 examples/eab_handler/kid_profiles.json
@@ -102,6 +103,8 @@ jobs:
 
     - name: "EAB ACME Profile - Test enrollment"
       uses: ./.github/actions/wf_specific/digicert_ca_handler/enroll_eab_acmeprofile
+      with:
+        DEPLOYMENT_TYPE: "container"
 
     - name: "Check container configuration"
       uses: ./.github/actions/container_check
