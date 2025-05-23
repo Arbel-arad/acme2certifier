@@ -389,7 +389,7 @@ jobs:
       env:
         EXEC_SCRIPT: ${{ matrix.execscript }}
 
-    - name: "EAB - Test enrollment"
+    - name: "ACME Profile - Test enrollment"
       uses: ./.github/actions/wf_specific/digicert_ca_handler/enroll_acmeprofile
       with:
         DEPLOYMENT_TYPE: "rpm"

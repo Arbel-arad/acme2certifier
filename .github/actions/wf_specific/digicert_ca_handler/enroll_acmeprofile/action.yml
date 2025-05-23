@@ -82,6 +82,6 @@ runs:
         docker-compose logs | grep "cert_type: ssl_securesite_pro"
         sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' acme2certifier_acme-srv_1)
       elif [ ${{ inputs.DEPLOYMENT_TYPE }} == "rpm" ]; then
-        docker exec -i acme-srv tail -n 250 /var/log/messages | grep "cert_type: ssl_securesite_pro"
+        docker exec -i acme-srv tail -n 500 /var/log/messages | grep "cert_type: ssl_securesite_pro"
       fi
     shell: bash
