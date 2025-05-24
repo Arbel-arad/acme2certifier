@@ -49,13 +49,13 @@ runs:
     with:
       time: 60s
 
-  - name: "Fix 1st time start issues with OpenXPKI server"
-    working-directory: /tmp/openxpki/openxpki-docker
-    run: |
-      docker ps
-      docker stop openxpki-docker_openxpki-server_1
-      docker start openxpki-docker_openxpki-server_1
-    shell: bash
+  # - name: "Fix 1st time start issues with OpenXPKI server"
+  #   working-directory: /tmp/openxpki/openxpki-docker
+  #  run: |
+  #    docker ps
+  #    docker stop openxpki-docker_openxpki-server_1
+  #    docker start openxpki-docker_openxpki-server_1
+  #  shell: bash
 
   - name: "Sleep for 10s"
     uses: juliangruber/sleep-action@v2.0.3
