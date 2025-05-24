@@ -259,7 +259,7 @@ class CAhandler(object):
         self.profiles = config_profile_load(self.logger, config_dic)
 
         # load header info
-        self.header_info_field = config_headerinfo_load(self.logger, config_dic)
+        # self.header_info_field = config_headerinfo_load(self.logger, config_dic)
 
         # load allowed domainlist
         self.allowed_domainlist = config_allowed_domainlist_load(

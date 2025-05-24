@@ -117,18 +117,7 @@ jobs:
       with:
         TEST_ADL: "true"
 
-    - name: "Verify allowed_domainlist error"
-      run: |
-        cd examples/Docker
-        docker-compose logs | grep "allowed_domainlist" | grep -i "either CN or SANs are not allowed by configuration"
-
-    - name: "Delete acme-sh, letsencypt and lego folders"
-      run: |
-        sudo rm -rf  lego/*
-        sudo rm -rf  acme-sh/*
-        sudo rm -rf  certbot/*
-
-    - name: "Reconfigure a2c (pkcs12 support)"
+    - name: "ACME Profilining - setup a2c with openxpki_ca_handler"
       run: |
         sudo head -n -8 .github/openssl_ca_handler.py_acme_srv_default_handler.cfg > examples/Docker/data/acme_srv.cfg
         sudo echo "handler_file: examples/ca_handler/openxpki_ca_handler.py" >> examples/Docker/data/acme_srv.cfg
@@ -141,15 +130,18 @@ jobs:
         sudo echo "endpoint_name: enroll" >> examples/Docker/data/acme_srv.cfg
         sudo echo "polling_timeout: 60" >> examples/Docker/data/acme_srv.cfg
         sudo echo "allowed_domainlist: [\"bar.local\", \"*.acme\"]" >> examples/Docker/data/acme_srv.cfg
+        sudo sed -i "s/tnauthlist_support: False/tnauthlist_support: False\nprofiles={\"tls-client\": \"http:\/\/foo.bar\/profile1\", \"tls-server\": \"http:\/\/foo.bar\/profile2\", \"profile3\": \"http:\/\/foo.bar\/profile3\"}/g" examples/Docker/data/acme_srv.cfg
+        sudo echo "enrollment_config_log: True" >> examples/Docker/data/acme_srv.cfg
         cd examples/Docker/
         docker-compose restart
       env:
         OPENXPKI_IP: ${{ env.RUNNER_IP }}
 
-    - name: "Test enrollment"
-      uses: ./.github/actions/acme_clients
+    - name: "ACME Profile - Test enrollment"
+      uses: ./.github/actions/wf_specific/digicert_ca_handler/enroll_acmeprofile
       with:
-        TEST_ADL: "true"
+        DEPLOYMENT_TYPE: "container"
+
 
     - name: "Verify allowed_domainlist error"
       run: |
