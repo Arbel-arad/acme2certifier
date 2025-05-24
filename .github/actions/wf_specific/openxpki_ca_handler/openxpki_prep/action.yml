@@ -44,10 +44,10 @@ runs:
       docker-compose up &
     shell: bash
 
-  - name: "Sleep for 60s"
+  - name: "Sleep for 25s"
     uses: juliangruber/sleep-action@v2.0.3
     with:
-      time: 60s
+      time: 25s
 
   - name: "Fix 1st time start issues with OpenXPKI server"
     working-directory: /tmp/openxpki/openxpki-docker
@@ -66,9 +66,9 @@ runs:
     working-directory: /tmp/openxpki
     run: |
       docker ps
-      docker exec -u root  -it OpenXPKI_Server /usr/share/doc/libopenxpki-perl/examples/sampleconfig.sh
+      docker exec -u root  -id OpenXPKI_Server /usr/share/doc/libopenxpki-perl/examples/sampleconfig.sh
       # docker exec -id OpenXPKI_Server /bin/bash /etc/openxpki/contrib/sampleconfig.sh
-      docker exec -id OpenXPKI_Client apt-get install -y libjson-pp-perl
+      docker exec -u root -id OpenXPKI_Client apt-get install -y libjson-pp-perl
     shell: bash
 
   - name: "Sleep for 60s"
