@@ -70,10 +70,10 @@ runs:
       docker exec -id OpenXPKI_Client apt-get install -y libjson-pp-perl
     shell: bash
 
-  - name: "Sleep for 45s"
+  - name: "Sleep for 60s"
     uses: juliangruber/sleep-action@v2.0.3
     with:
-      time: 45s
+      time: 60s
 
   - name: "Enroll keys for Client-authentication via scep"
     working-directory: ${{ inputs.WORKING_DIR }}
