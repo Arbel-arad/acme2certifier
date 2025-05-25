@@ -98,7 +98,7 @@ jobs:
         OPENXPKI_IP: ${{ env.RUNNER_IP }}
 
     - name: "ACME Profile - Test enrollment"
-      uses: ./.github/actions/wf_specific/digicert_ca_handler/enroll_acmeprofile
+      uses: ./.github/actions/wf_specific/openxpki_ca_handler/enroll_acmeprofile
       with:
         DEPLOYMENT_TYPE: "container"
 
