@@ -53,6 +53,11 @@ runs:
       exit 1
     shell: bash
 
+  - name: "Sleep for 5s"
+    uses: juliangruber/sleep-action@v2.0.3
+    with:
+      time: 5s
+
   - name: "ACME Profile - 02 - Check logs"
     working-directory: examples/Docker/
     run: |
@@ -72,6 +77,11 @@ runs:
       sudo openssl x509 -in lego/certificates/lego.acme.crt -issuer --noout
       sudo openssl verify -CAfile cert-2.pem -untrusted cert-1.pem  lego/certificates/lego.acme.crt
     shell: bash
+
+  - name: "Sleep for 5s"
+    uses: juliangruber/sleep-action@v2.0.3
+    with:
+      time: 5s
 
   - name: "ACME Profile - 03 - Check logs"
     working-directory: examples/Docker/
