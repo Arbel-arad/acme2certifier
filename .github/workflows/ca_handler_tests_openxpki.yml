@@ -130,7 +130,7 @@ jobs:
 
     - name: "Reconfigure a2c (pkcs12 support)"
       run: |
-        sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' acme2certifier_acme-srv_1)      
+        sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' acme2certifier_acme-srv_1)
         sudo head -n -8 .github/openssl_ca_handler.py_acme_srv_default_handler.cfg > examples/Docker/data/acme_srv.cfg
         sudo echo "handler_file: examples/ca_handler/openxpki_ca_handler.py" >> examples/Docker/data/acme_srv.cfg
         sudo echo "host: https://openxpki:8443" >> examples/Docker/data/acme_srv.cfg
@@ -159,7 +159,7 @@ jobs:
 
     - name: "ACME Profilining - setup a2c with openxpki_ca_handler"
       run: |
-        sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' acme2certifier_acme-srv_1)      
+        sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' acme2certifier_acme-srv_1)
         sudo head -n -8 .github/openssl_ca_handler.py_acme_srv_default_handler.cfg > examples/Docker/data/acme_srv.cfg
         sudo echo "handler_file: examples/ca_handler/openxpki_ca_handler.py" >> examples/Docker/data/acme_srv.cfg
         sudo echo "host: https://openxpki:8443" >> examples/Docker/data/acme_srv.cfg
@@ -322,10 +322,6 @@ jobs:
       run: |
         docker exec acme-srv sh /tmp/acme2certifier/rpm_tester.sh restart
 
-    - name: "Execute install scipt"
-      run: |
-        docker exec acme-srv sh /tmp/acme2certifier/rpm_tester.sh
-
     - name: "Test enrollment"
       uses: ./.github/actions/acme_clients
       with:
@@ -398,9 +394,72 @@ jobs:
       with:
         TEST_ADL: "true"
 
-    # - name: "Verify allowed_domainlist error"
-    #  run: |
-    #    docker exec acme-srv grep -i "either CN or SANs are not allowed by configuration" /var/log/messages
+    - name: "ACME Profilining - setup a2c with openxpki_ca_handler"
+      run: |
+        sudo head -n -8 .github/openssl_ca_handler.py_acme_srv_default_handler.cfg > data/acme_srv.cfg
+        sudo echo "handler_file: examples/ca_handler/openxpki_ca_handler.py" >> data/acme_srv.cfg
+        sudo echo "host: https://openxpki:8443" >> data/acme_srv.cfg
+        sudo echo "client_cert: volume/acme_ca/client_crt.p12" >> data/acme_srv.cfg
+        sudo echo "cert_passphrase: Test1234" >> data/acme_srv.cfg
+        sudo echo "ca_bundle: volume/acme_ca/ca_bundle.pem" >> data/acme_srv.cfg
+        sudo echo "cert_profile_name: tls-server" >> data/acme_srv.cfg
+        sudo echo "endpoint_name: enroll" >> data/acme_srv.cfg
+        sudo echo "polling_timeout: 60" >> data/acme_srv.cfg
+        sudo echo "allowed_domainlist: [\"bar.local\", \"*.acme\"]" >> data/acme_srv.cfg
+        sudo echo "enrollment_config_log: True" >> data/acme_srv.cfg
+        sudo sed -i "s/tnauthlist_support: False/tnauthlist_support: False\nprofiles={\"tls-client\": \"http:\/\/foo.bar\/profile1\", \"tls-server\": \"http:\/\/foo.bar\/profile2\", \"profile3\": \"http:\/\/foo.bar\/profile3\"}/g" data/acme_srv.cfg
+      env:
+        OPENXPKI_IP: ${{ env.RUNNER_IP }}
+
+    - name: "Reconfigure a2c "
+      run: |
+        docker exec acme-srv sh /tmp/acme2certifier/rpm_tester.sh restart
+
+    - name: "ACME Profile - Test enrollment"
+      uses: ./.github/actions/wf_specific/openxpki_ca_handler/enroll_acmeprofile
+      with:
+        DEPLOYMENT_TYPE: "rpm"
+
+    - name: "EAB ACME Profilining - setup a2c with openxpki_ca_handler"
+      run: |
+        sudo head -n -8 .github/openssl_ca_handler.py_acme_srv_default_handler.cfg > data/acme_srv.cfg
+        sudo echo "handler_file: examples/ca_handler/openxpki_ca_handler.py" >> data/acme_srv.cfg
+        sudo echo "host: https://openxpki:8443" >> data/acme_srv.cfg
+        # sudo echo "host: https://$OPENXPKI_IP:8443" >> data/acme_srv.cfg
+        sudo echo "client_cert: volume/acme_ca/client_crt.p12" >> data/acme_srv.cfg
+        sudo echo "cert_passphrase: Test1234" >> data/acme_srv.cfg
+        sudo echo "ca_bundle: volume/acme_ca/ca_bundle.pem" >> data/acme_srv.cfg
+        sudo echo "cert_profile_name: tls-server" >> data/acme_srv.cfg
+        sudo echo "endpoint_name: enroll" >> data/acme_srv.cfg
+        sudo echo "polling_timeout: 60" >> data/acme_srv.cfg
+        sudo echo "allowed_domainlist: [\"bar.local\", \"*.acme\"]" >> data/acme_srv.cfg
+        sudo echo "enrollment_config_log: True" >> data/acme_srv.cfg
+        sudo echo "eab_profiling: True" >> data/acme_srv.cfg
+        sudo sed -i "s/tnauthlist_support: False/tnauthlist_support: False\nprofiles={\"tls-client\": \"http:\/\/foo.bar\/profile1\", \"tls-server\": \"http:\/\/foo.bar\/profile2\", \"profile3\": \"http:\/\/foo.bar\/profile3\"}/g" data/acme_srv.cfg
+        sudo echo -e "\n\n[EABhandler]" >> data/acme_srv.cfg
+        sudo echo "eab_handler_file: /var/www/acme2certifier/examples/eab_handler/kid_profile_handler.py" >> data/acme_srv.cfg
+        sudo echo "key_file: volume/kid_profiles.json" >> data/acme_srv.cfg
+
+        sudo cp examples/eab_handler/kid_profiles.json data/kid_profiles.json
+        sudo chmod 777 examples/eab_handler/kid_profiles.json
+        sudo sed -i "s/\"profile_id\"\: \[\"profile_1\", \"profile_2\", \"profile_3\"\]/\"cert_profile_name\"\: \[\"tls-server\", \"tls-client\", \"profile_3\"\]/g" data/kid_profiles.json
+        sudo sed -i "s/\"profile_id\"\: \"profile_2\"/\"cert_profile_name\"\: \"tls-client\"/g" data/kid_profiles.json
+        sudo sed -i "s/\"ca_name\": \"example_ca\",/\"unknown_key\": \"unknown_value\"/g" data/kid_profiles.json
+        sudo sed -i "s/\"ca_name\": \"example_ca_2\",/\"unknown_key\": \"unknown_value\"/g" data/kid_profiles.json
+        sudo sed -i "s/www.example.org/*.acme/g" data/kid_profiles.json
+        sudo sed -i '18,19d' data/kid_profiles.json
+        sudo sed -i '8,9d' data/kid_profiles.json
+      env:
+        OPENXPKI_IP: ${{ env.RUNNER_IP }}
+
+    - name: "Reconfigure a2c "
+      run: |
+        docker exec acme-srv sh /tmp/acme2certifier/rpm_tester.sh restart
+
+    - name: "EAB ACME Profile - Test enrollment"
+      uses: ./.github/actions/wf_specific/openxpki_ca_handler/enroll_eab_acmeprofile
+      with:
+        DEPLOYMENT_TYPE: "rpm"
 
     - name: "Delete acme-sh, letsencypt and lego folders"
       run: |
