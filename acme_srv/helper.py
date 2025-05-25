@@ -2386,6 +2386,7 @@ def enrollment_config_log(
         "secret",
         "token",
         "err_msg_dic",
+        "dbstore",
     ]
 
     if handler_skiplist and isinstance(handler_skiplist, list):
