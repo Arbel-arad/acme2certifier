@@ -77,7 +77,7 @@ jobs:
         DB_HANDLER: ${{ matrix.dbhandler }}
         WEB_SRV: ${{ matrix.websrv }}
 
-    - name: "ACME Profilining - setup a2c with openxpki_ca_handler"
+    - name: "EAB ACME Profilining - setup a2c with openxpki_ca_handler"
       run: |
         sudo head -n -8 .github/openssl_ca_handler.py_acme_srv_default_handler.cfg > examples/Docker/data/acme_srv.cfg
         sudo echo "handler_file: examples/ca_handler/openxpki_ca_handler.py" >> examples/Docker/data/acme_srv.cfg
@@ -92,13 +92,27 @@ jobs:
         sudo echo "allowed_domainlist: [\"bar.local\", \"*.acme\"]" >> examples/Docker/data/acme_srv.cfg
         sudo echo "enrollment_config_log: True" >> examples/Docker/data/acme_srv.cfg
         sudo sed -i "s/tnauthlist_support: False/tnauthlist_support: False\nprofiles={\"tls-client\": \"http:\/\/foo.bar\/profile1\", \"tls-server\": \"http:\/\/foo.bar\/profile2\", \"profile3\": \"http:\/\/foo.bar\/profile3\"}/g" examples/Docker/data/acme_srv.cfg
+        sudo echo -e "\n\n[EABhandler]" >> examples/Docker/data/acme_srv.cfg
+        sudo echo "eab_handler_file: /var/www/acme2certifier/examples/eab_handler/kid_profile_handler.py" >> examples/Docker/data/acme_srv.cfg
+        sudo echo "key_file: volume/kid_profiles.json" >> examples/Docker/data/acme_srv.cfg
+
+        sudo cp examples/eab_handler/kid_profiles.json examples/Docker/data/kid_profiles.json
+        sudo chmod 777 examples/eab_handler/kid_profiles.json
+        sudo sed -i "s/\"profile_id\"\: \[\"profile_1\", \"profile_2\", \"profile_3\"\]/\"cert_profile_name\"\: \[\"tls-server\", \"tls-client\", \"profile_3\"\]/g" examples/Docker/data/kid_profiles.json
+        sudo sed -i "s/\"profile_id\"\: \"profile_2\"/\"cert_profile_name\"\: \"tls-client\"/g" examples/Docker/data/kid_profiles.json
+        sudo sed -i "s/\"ca_name\": \"example_ca\",/\"unknown_key\": \"unknown_value\"/g" examples/Docker/data/kid_profiles.json
+        sudo sed -i "s/\"ca_name\": \"example_ca_2\",/\"unknown_key\": \"unknown_value\"/g" examples/Docker/data/kid_profiles.json
+        sudo sed -i "s/www.example.org/*.acme/g" examples/Docker/data/kid_profiles.json
+        sudo sed -i '18,19d' examples/Docker/data/kid_profiles.json
+        sudo sed -i '8,9d' examples/Docker/data/kid_profiles.json
+
         cd examples/Docker/
         docker-compose restart
       env:
         OPENXPKI_IP: ${{ env.RUNNER_IP }}
 
-    - name: "ACME Profile - Test enrollment"
-      uses: ./.github/actions/wf_specific/openxpki_ca_handler/enroll_acmeprofile
+    - name: "EAB ACME Profile - Test enrollment"
+      uses: ./.github/actions/wf_specific/openxpki_ca_handler/enroll_eab_acmeprofile
       with:
         DEPLOYMENT_TYPE: "container"
 
