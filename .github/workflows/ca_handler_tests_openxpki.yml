@@ -232,7 +232,6 @@ jobs:
         sudo cp -rp acme-sh/ ${{ github.workspace }}/artifact/acme-sh/
         sudo cp -rp certbot/ ${{ github.workspace }}/artifact/certbot/
         sudo cp -rp lego/ ${{ github.workspace }}/artifact/lego/
-        docker logs openxpki-docker_openxpki-server_1 > ${{ github.workspace }}/artifact/openxpki.log
         cd examples/Docker
         docker-compose logs > ${{ github.workspace }}/artifact/a2c.log
         sudo tar -C ${{ github.workspace }}/artifact/ -cvzf ${{ github.workspace }}/artifact/upload/artifact.tar.gz openxpki.log a2c.log data acme-sh certbot lego
@@ -472,8 +471,8 @@ jobs:
       run: |
         mkdir -p ${{ github.workspace }}/artifact/upload
         docker exec acme-srv tar cvfz /tmp/acme2certifier/a2c.tgz /opt/acme2certifier
-        docker logs openxpki-docker_openxpki-server_1 > ${{ github.workspace }}/artifact/openxpki_server.log
-        docker logs openxpki-docker_openxpki-client_1 > ${{ github.workspace }}/artifact/openxpki_client.log
+        # docker logs openxpki-docker_openxpki-server_1 > ${{ github.workspace }}/artifact/openxpki_server.log
+        # docker logs openxpki-docker_openxpki-client_1 > ${{ github.workspace }}/artifact/openxpki_client.log
         sudo cp -rp data/ ${{ github.workspace }}/artifact/data/
         sudo cp -rp acme-sh/ ${{ github.workspace }}/artifact/acme-sh/
         sudo rm ${{ github.workspace }}/artifact/data/*.rpm
