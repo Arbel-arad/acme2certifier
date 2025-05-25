@@ -38,6 +38,11 @@ jobs:
         DB_HANDLER: ${{ matrix.dbhandler }}
         WEB_SRV: ${{ matrix.websrv }}
 
+    - name: "Setup a2c with est_ca_handler"
+      run: |
+        sudo touch examples/Docker/data/acme_srv.cfg
+        sudo chmod 777 examples/Docker/data/acme_srv.cfg
+
     - name: "Setup a2c with openxpki_ca_handler"
       run: |
         sudo head -n -8 .github/openssl_ca_handler.py_acme_srv_default_handler.cfg > examples/Docker/data/acme_srv.cfg
@@ -85,8 +90,8 @@ jobs:
         sudo echo "endpoint_name: enroll" >> examples/Docker/data/acme_srv.cfg
         sudo echo "polling_timeout: 60" >> examples/Docker/data/acme_srv.cfg
         sudo echo "allowed_domainlist: [\"bar.local\", \"*.acme\"]" >> examples/Docker/data/acme_srv.cfg
-        sudo sed -i "s/tnauthlist_support: False/tnauthlist_support: False\nprofiles={\"tls-client\": \"http:\/\/foo.bar\/profile1\", \"tls-server\": \"http:\/\/foo.bar\/profile2\", \"profile3\": \"http:\/\/foo.bar\/profile3\"}/g" examples/Docker/data/acme_srv.cfg
         sudo echo "enrollment_config_log: True" >> examples/Docker/data/acme_srv.cfg
+        sudo sed -i "s/tnauthlist_support: False/tnauthlist_support: False\nprofiles={\"tls-client\": \"http:\/\/foo.bar\/profile1\", \"tls-server\": \"http:\/\/foo.bar\/profile2\", \"profile3\": \"http:\/\/foo.bar\/profile3\"}/g" examples/Docker/data/acme_srv.cfg
         cd examples/Docker/
         docker-compose restart
       env:
