@@ -696,7 +696,7 @@ class CAhandler(object):
             error = eab_profile_header_info_check(self.logger, self, csr, "profile")
 
         if self.enrollment_config_log:
-            self.enrollment_config_log_skip_list.extend(["dbstore", "eab_mack_key"])
+            self.enrollment_config_log_skip_list.extend(["dbstore", "eab_mac_key"])
             enrollment_config_log(
                 self.logger, self, self.enrollment_config_log_skip_list
             )

@@ -87,9 +87,9 @@ runs:
     working-directory: examples/Docker/
     run: |
       if [ ${{ inputs.DEPLOYMENT_TYPE }} == "container" ]; then
-        docker-compose logs | grep "cert_profile_name: profile2"
+        docker-compose logs | grep "profile: profile2"
         sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' acme2certifier_acme-srv_1)
       elif [ ${{ inputs.DEPLOYMENT_TYPE }} == "rpm" ]; then
-        docker exec -i acme-srv tail -n 500 /var/log/messages | grep "cert_profile_name: profile2"
+        docker exec -i acme-srv tail -n 500 /var/log/messages | grep "profile: profile2"
       fi
     shell: bash
