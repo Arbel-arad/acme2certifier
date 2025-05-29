@@ -318,8 +318,6 @@ class CAhandler(object):
             )
             order = acmeclient.new_order(csr_pem=csr_pem)
 
-        import sys
-        sys.exit(1)
         error = None
         cert_bundle = None
         cert_raw = None
