@@ -74,6 +74,7 @@ jobs:
     - name: "ACME Profile - Setup acme ca_handler"
       run: |
         sudo mkdir -p examples/Docker/data/acme
+        sudo chmod -R 777 examples/Docker/data/acme
         sudo cp .github/openssl_ca_handler.py_acme_srv_default_handler.cfg examples/Docker/data/acme_srv.cfg
         sudo chmod 777 examples/Docker/data/acme_srv.cfg
         sudo head -n -8 .github/openssl_ca_handler.py_acme_srv_default_handler.cfg > examples/Docker/data/acme_srv.cfg
