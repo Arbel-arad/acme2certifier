@@ -8,24 +8,6 @@ on:
     - cron:  '0 2 * * 6'
 
 jobs:
-  container_build:
-    name: "container_build"
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        websrv: ['apache2']
-        dbhandler: ['wsgi']
-
-    steps:
-    - name: "checkout GIT"
-      uses: actions/checkout@v4
-
-    - name: "Build container"
-      uses: ./.github/actions/container_build_upload
-      with:
-        DB_HANDLER: ${{ matrix.dbhandler }}
-        WEB_SRV: ${{ matrix.websrv }}
 
   acme_ca_handler_test:
     name: "acme_ca_handler_test"
@@ -41,25 +23,11 @@ jobs:
     - name: "checkout GIT"
       uses: actions/checkout@v4
 
-    - name: "Download container"
-      uses: actions/download-artifact@v4
-      with:
-        name: a2c-${{ github.run_id }}.${{ matrix.websrv }}.${{ matrix.dbhandler }}.tar.gz
-        path: /tmp
-
-    - name: "Import container"
-      run: |
-        sudo apt-get install -y docker-compose
-        gunzip /tmp/a2c-${{ github.run_id }}.${{ matrix.websrv }}.${{ matrix.dbhandler }}.tar.gz
-        docker load -i /tmp/a2c-${{ github.run_id }}.${{ matrix.websrv }}.${{ matrix.dbhandler }}.tar
-        docker images
-
     - name: "Prepare container environment"
       uses: ./.github/actions/container_prep
       with:
         DB_HANDLER: ${{ matrix.dbhandler }}
         WEB_SRV: ${{ matrix.websrv }}
-        CONTAINER_BUILD: false
 
     - name: "Setup acme-le-sim"
       uses: ./.github/actions/wf_specific/acme_ca_handler/le-sim_prep
