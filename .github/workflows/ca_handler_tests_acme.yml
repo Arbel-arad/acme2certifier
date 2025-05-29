@@ -65,6 +65,12 @@ jobs:
         cd examples/Docker
         docker-compose logs | grep -i "found in keyfile"
 
+    - name: "Check container configuration"
+      uses: ./.github/actions/container_check
+      with:
+        DB_HANDLER: ${{ matrix.dbhandler }}
+        WEB_SRV: ${{ matrix.websrv }}
+
     - name: "ACME Profile - Setup acme ca_handler"
       run: |
         sudo mkdir -p examples/Docker/data/acme
@@ -84,12 +90,8 @@ jobs:
 
     - name: "ACME Profile - enrollment"
       uses: ./.github/actions/wf_specific/acme_ca_handler/enroll_acmeprofile
-
-    - name: "Check container configuration"
-      uses: ./.github/actions/container_check
       with:
-        DB_HANDLER: ${{ matrix.dbhandler }}
-        WEB_SRV: ${{ matrix.websrv }}
+        DEPLOYMENT_TYPE: "container"
 
     - name: "[ * ] collecting test data"
       if: ${{ failure() }}
