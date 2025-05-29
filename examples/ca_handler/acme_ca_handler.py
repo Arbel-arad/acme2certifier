@@ -56,6 +56,7 @@ class CAhandler(object):
         self.enrollment_config_log = False
         self.enrollment_config_log_skip_list = []
         self.profiles = {}
+        self.profile = None
 
     def __enter__(self):
         """Makes CAhandler a Context Manager"""
@@ -110,6 +111,8 @@ class CAhandler(object):
         self.eab_kid = config_dic.get("CAhandler", "eab_kid", fallback=None)
         self.eab_hmac_key = config_dic.get("CAhandler", "eab_hmac_key", fallback=None)
         self.acme_keypath = config_dic.get("CAhandler", "acme_keypath", fallback=None)
+        self.profile = config_dic.get("CAhandler", "profile", fallback=None)
+
         self.logger.debug("CAhandler._config_eab_load() ended")
 
     def _config_load(self):
@@ -297,8 +300,26 @@ class CAhandler(object):
     ) -> Tuple[str, str, str]:
         """isuse order"""
         self.logger.debug("CAhandler._order_issue() csr: " + str(csr_pem))
-        order = acmeclient.new_order(csr_pem)
 
+        try:
+            if self.profile:
+                # profile is set
+                self.logger.debug("CAhandler._order_issue() adding profile: %s", self.profile)
+                order = acmeclient.new_order(
+                    csr_pem=csr_pem, profile=self.profile
+                )
+            else:
+                # no profile set
+                self.logger.debug("CAhandler._order_issue() no profile set")
+                order = acmeclient.new_order(csr_pem=csr_pem)
+        except Exception as err:
+            self.logger.error(
+                "CAhandler._order_issue() failed to create order: %s. Try without profile information.", err
+            )
+            order = acmeclient.new_order(csr_pem=csr_pem)
+
+        import sys
+        sys.exit(1)
         error = None
         cert_bundle = None
         cert_raw = None
@@ -674,7 +695,7 @@ class CAhandler(object):
 
         # check for eab profiling and header_info
         if not error:
-            error = eab_profile_header_info_check(self.logger, self, csr, "acme_url")
+            error = eab_profile_header_info_check(self.logger, self, csr, "profile")
 
         if self.enrollment_config_log:
             self.enrollment_config_log_skip_list.extend(["dbstore", "eab_mack_key"])
