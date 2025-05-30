@@ -218,7 +218,7 @@ jobs:
         DB_HANDLER: ${{ matrix.dbhandler }}
         WEB_SRV: ${{ matrix.websrv }}
 
-    - name: "Profiling - enrollment"
+    - name: "EAB ACME Profiling - enrollment"
       uses: ./.github/actions/wf_specific/acme_ca_handler/enroll_eab_acmeprofile
       with:
         DEPLOYMENT_TYPE: "container"
