@@ -220,6 +220,8 @@ jobs:
 
     - name: "Profiling - enrollment"
       uses: ./.github/actions/wf_specific/acme_ca_handler/enroll_eab_acmeprofile
+      with:
+        DEPLOYMENT_TYPE: "container"
 
     - name: "Check container configuration"
       uses: ./.github/actions/container_check
