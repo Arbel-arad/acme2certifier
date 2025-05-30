@@ -193,7 +193,7 @@ jobs:
         sudo echo "acme_keypath: volume/acme/" >> examples/Docker/data/acme_srv.cfg
         sudo echo "acme_url: http://acme-le-sim-1" >> examples/Docker/data/acme_srv.cfg
         sudo echo "acme_account_email: grindsa@foo.bar" >> examples/Docker/data/acme_srv.cfg
-        sudo sed -i "s/tnauthlist_support: False/tnauthlist_support: False\nprofiles={\"profile1\": \"http:\/\/foo.bar\/profile1\", \"profile2\": \"http:\/\/foo.bar\/profile2\", \"profile3\": \"http:\/\/foo.bar\/profile3\"}/g" examples/Docker/data/acme_srv.cfg
+        sudo sed -i "s/tnauthlist_support: False/tnauthlist_support: False\nprofiles={\"profile_1\": \"http:\/\/foo.bar\/profile_1\", \"profile_2\": \"http:\/\/foo.bar\/profile_2\", \"profile_3\": \"http:\/\/foo.bar\/profile_3\"}/g" examples/Docker/data/acme_srv.cfg
         sudo sed -i "s/challenge_validation_disable: False/challenge_validation_disable: True/g" examples/Docker/data/acme_srv.cfg
         sudo echo "eab_profiling: True" >> examples/Docker/data/acme_srv.cfg
         sudo echo "enrollment_config_log: True" >> examples/Docker/data/acme_srv.cfg
