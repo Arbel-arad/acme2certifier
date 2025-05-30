@@ -387,12 +387,8 @@ jobs:
         sudo sed -i "s/example.net/acme/g" examples/Docker/data/kid_profiles.json
         sudo sed -i '18,19d' examples/Docker/data/kid_profiles.json
         sudo sed -i '8,9d' examples/Docker/data/kid_profiles.json
-
-    - name: "Bring up a2c container"
-      uses: ./.github/actions/container_up
-      with:
-        DB_HANDLER: ${{ matrix.dbhandler }}
-        WEB_SRV: ${{ matrix.websrv }}
+        cd examples/Docker/
+        docker-compose restart
 
     - name: "EAB ACME Profiling - enrollment"
       uses: ./.github/actions/wf_specific/acme_ca_handler/enroll_eab_acmeprofile
