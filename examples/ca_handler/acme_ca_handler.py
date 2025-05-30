@@ -546,11 +546,11 @@ class CAhandler(object):
 
         result = None
         new_value, error = client_parameter_validate(
-            self.logger, csr, self.header_info_field, key, value
+            self.logger, csr, self, key, value
         )
         if new_value:
             self.logger.debug(
-                "CAhandler._eab_profile_list_check(): setting attribute: %s to %s",
+                "CAhandler._eab_profile_list_set(): setting attribute: %s to %s",
                 key,
                 new_value,
             )
@@ -559,7 +559,7 @@ class CAhandler(object):
                 if not self.acme_keypath:
                     result = "acme_keypath is missing in config"
                     self.logger.error(
-                        "CAhandler._eab_profile_list_check(): acme_keypath is missing in config"
+                        "CAhandler._eab_profile_list_set(): acme_keypath is missing in config"
                     )
                 else:
                     self.acme_url_dic = parse_url(self.logger, new_value)
