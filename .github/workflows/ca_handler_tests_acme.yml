@@ -250,8 +250,8 @@ jobs:
         sudo chmod 777 examples/eab_handler/kid_profiles.json
         sudo sed -i "s/profile_id/profile/g" examples/Docker/data/kid_profiles.json
         # sudo sed -i "s/\"profile_id\"\: \"profile_2\"/\"acme_url\"\: \"http:\/\/acme-le-sim-2.acme\"/g" examples/Docker/data/kid_profiles.json
-        sudo sed -i "s/\"ca_name\": \"example_ca_2\",/\"acme_keyfile\": \"\/var\/www\/acme2certifier\/volume\/acme-le-sim-2.json\"/" examples/Docker/data/kid_profiles.json
-        sudo sed -i "s/\"ca_name\": \"example_ca\",/\"acme_keyfile\": \[\"\/var\/www\/acme2certifier\/volume\/acme-le-sim-1.json\", \"\/var\/www\/acme2certifier\/volume\/acme-le-sim-2.json\"\]/g" examples/Docker/data/kid_profiles.json
+        sudo sed -i "s/\"ca_name\": \"example_ca\",/\"unknown_key\": \"unknown_value\"/g" examples/Docker/data/kid_profiles.json
+        sudo sed -i "s/\"ca_name\": \"example_ca_2\",/\"unknown_key\": \"unknown_value\"/g" examples/Docker/data/kid_profiles.json
         sudo sed -i "s/example.net/acme/g" examples/Docker/data/kid_profiles.json
         sudo sed -i '18,19d' examples/Docker/data/kid_profiles.json
         sudo sed -i '8,9d' examples/Docker/data/kid_profiles.json
