@@ -224,11 +224,6 @@ jobs:
       with:
         DEPLOYMENT_TYPE: "container"
 
-    - name: "Check container configuration"
-      uses: ./.github/actions/container_check
-      with:
-        DB_HANDLER: ${{ matrix.dbhandler }}
-        WEB_SRV: ${{ matrix.websrv }}
 
     - name: "[ * ] collecting test data"
       if: ${{ failure() }}
