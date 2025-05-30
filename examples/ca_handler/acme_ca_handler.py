@@ -664,6 +664,16 @@ class CAhandler(object):
                     "CAhandler._registration_lookup(): found existing account: %s",
                     regr.uri,
                 )
+            else:
+                self.logger.error(
+                    "CAhandler._registration_lookup(): account lookup failed. Account %s not found. Trying to register new account.",
+                    self.account,
+                )
+                regr = self._account_register(acmeclient, user_key, directory)
+                if hasattr(regr, "uri"):
+                    self.logger.info(
+                        "CAhandler._registration_lookup(): new account: %s", regr.uri
+                    )
         else:
             # new account or existing account with missing account id
             regr = self._account_register(acmeclient, user_key, directory)
