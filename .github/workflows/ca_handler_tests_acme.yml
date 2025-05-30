@@ -281,7 +281,7 @@ jobs:
     - name: "EAB ACME Profiling - enrollment"
       uses: ./.github/actions/wf_specific/acme_ca_handler/enroll_eab_acmeprofile
       with:
-        DEPLOYMENT_TYPE: "container"
+        DEPLOYMENT_TYPE: "rpm"
 
 
     - name: "[ * ] collecting test logs"
