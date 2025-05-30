@@ -297,8 +297,6 @@ jobs:
         docker exec acme-srv cat /etc/nginx/nginx.conf.orig > ${{ github.workspace }}/artifact/data/nginx.conf.orig
         docker exec acme-srv cat /etc/nginx/nginx.conf > ${{ github.workspace }}/artifact/data/nginx.conf
         docker exec acme-srv cat /var/log/messages > ${{ github.workspace }}/artifact/acme-srv.log
-        docker logs le-sim-1 > ${{ github.workspace }}/artifact/acme-le-sim-1.log
-        docker logs le-sim-2 > ${{ github.workspace }}/artifact/acme-le-sim-2.log
         sudo tar -C ${{ github.workspace }}/artifact/ -cvzf ${{ github.workspace }}/artifact/upload/artifact.tar.gz data acme-srv.log acme-sh acme-le-sim-1.log acme-le-sim-2.log
 
     - name: "[ * ] uploading artificates"
