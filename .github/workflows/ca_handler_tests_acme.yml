@@ -227,13 +227,12 @@ jobs:
 
     - name: "EAB ACME Profiling - Setup acme ca_handler"
       run: |
-        sudo rm -rf examples/Docker/data/
         sudo mkdir -p examples/Docker/data/acme
         sudo cp .github/openssl_ca_handler.py_acme_srv_default_handler.cfg examples/Docker/data/acme_srv.cfg
         sudo chmod 777 examples/Docker/data/acme_srv.cfg
         sudo head -n -8 .github/openssl_ca_handler.py_acme_srv_default_handler.cfg > examples/Docker/data/acme_srv.cfg
         sudo echo "handler_file: examples/ca_handler/acme_ca_handler.py" >> examples/Docker/data/acme_srv.cfg
-        sudo echo "acme_keyfile: volume/acme/le_staging_private_key.json" >> examples/Docker/data/acme_srv.cfg
+        sudo echo "acme_keyfile: volume/acme/le_staging_private_key_prof.json" >> examples/Docker/data/acme_srv.cfg
         sudo echo "acme_keypath: volume/acme/" >> examples/Docker/data/acme_srv.cfg
         sudo echo "acme_url: http://acme-le-sim-1" >> examples/Docker/data/acme_srv.cfg
         sudo echo "acme_account_email: grindsa@foo.bar" >> examples/Docker/data/acme_srv.cfg
