@@ -71,7 +71,6 @@ runs:
 
   - name: "EAB with ACME profile - 03 - Enroll lego with a profile/ca_name taken from kid.json"
     run: |
-      sudo rm examples/Docker/data/acme/le_staging_private_key_prof.json
       sudo rm -rf lego/*
       docker run -i -v $PWD/lego:/.lego/ --rm --name lego --network acme goacme/lego -s http://acme-srv -a --email "lego@example.com" --eab --kid keyid_01 --hmac YW5vdXRoZXJfdmVyeV9sb25nX2htYWNfZm9yX2tleWlkXzAxX3doaWNoIHdpbGxfYmUgdXNlZF9kdXJpbmcgcmVncmVzc2lvbg  -k rsa2048 -d lego.acme --http run
     shell: bash

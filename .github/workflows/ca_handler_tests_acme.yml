@@ -249,7 +249,6 @@ jobs:
         sudo cp examples/eab_handler/kid_profiles.json examples/Docker/data/kid_profiles.json
         sudo chmod 777 examples/eab_handler/kid_profiles.json
         sudo sed -i "s/profile_id/profile/g" examples/Docker/data/kid_profiles.json
-        # sudo sed -i "s/\"profile_id\"\: \"profile_2\"/\"acme_url\"\: \"http:\/\/acme-le-sim-2.acme\"/g" examples/Docker/data/kid_profiles.json
         sudo sed -i "s/\"ca_name\": \"example_ca\",/\"unknown_key\": \"unknown_value\"/g" examples/Docker/data/kid_profiles.json
         sudo sed -i "s/\"ca_name\": \"example_ca_2\",/\"unknown_key\": \"unknown_value\"/g" examples/Docker/data/kid_profiles.json
         sudo sed -i "s/example.net/acme/g" examples/Docker/data/kid_profiles.json
