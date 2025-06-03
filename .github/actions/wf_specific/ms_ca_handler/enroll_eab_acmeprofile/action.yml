@@ -14,13 +14,13 @@ runs:
     with:
       time: 10s
 
-  - name: "EAB with headerinfo - Test http://acme-srv/directory is accessible"
+  - name: "EAB with ACME Profile - Test http://acme-srv/directory is accessible"
     run: docker run -i --rm --network $NAME_SPACE curlimages/curl -f http://acme-srv/directory
     shell: bash
     env:
       NAME_SPACE: ${{ inputs.NAME_SPACE }}
 
-  - name: "EAB with headerinfo - Test if https://acme-srv/directory is accessible"
+  - name: "EAB with ACME Profile - Test if https://acme-srv/directory is accessible"
     run: docker run -i --rm --network $NAME_SPACE curlimages/curl --insecure -f https://acme-srv/directory
     shell: bash
     env:
@@ -35,6 +35,18 @@ runs:
     shell: bash
     env:
       NAME_SPACE: ${{ inputs.NAME_SPACE }}
+
+  - name: "EAB with ACME Profile - 01a - Check logs"
+    working-directory: examples/Docker/
+    run: |
+      if [ ${{ inputs.DEPLOYMENT_TYPE }} == "container" ]; then
+        docker-compose logs | grep "template: WebServer"
+        sudo truncate -s 0 $(docker inspect --format='{{.LogPath}}' acme2certifier_acme-srv_1)
+      elif [ ${{ inputs.DEPLOYMENT_TYPE }} == "rpm" ]; then
+        docker exec -i acme-srv tail -n 500 /var/log/messages | grep "template: WebServer"
+      fi
+    shell: bash
+
 
   - name: "EAB with ACME Profile - 01b - enrollment with profile (pick value from list)"
     run: |

@@ -390,7 +390,7 @@ jobs:
   mscertsrv_handler_eab_profile_tests_rpm:
     name: "mscertsrv_handler_eab_profile_tests_rpm"
     runs-on: ubuntu-latest
-    needs: mscertsrv_handler_tests_rpm
+    # needs: mscertsrv_handler_tests_rpm
     strategy:
       # max-parallel: 1
       fail-fast: false
@@ -518,7 +518,7 @@ jobs:
   mswcce_handler_eab_profile_tests_rpm:
     name: "mswcce_handler_eab_profile_tests_rpm"
     runs-on: ubuntu-latest
-    needs: mscertsrv_handler_tests_rpm
+    # needs: mscertsrv_handler_tests_rpm
     strategy:
       # max-parallel: 1
       fail-fast: false
@@ -684,7 +684,7 @@ jobs:
   rpm_cleanup:
     name: "rpm_cleanup"
     runs-on: ubuntu-latest
-    needs: [mscertsrv_handler_tests_rpm, mscertsrv_handler_eab_profile_tests_rpm, mswcce_handler_tests_rpm, mswcce_handler_eab_profile_tests_rpm]
+    needs: [mscertsrv_handler_eab_profile_tests_rpm, mswcce_handler_eab_profile_tests_rpm]
     steps:
     - name: "Delete artifact"
       uses: geekyeggo/delete-artifact@v5
