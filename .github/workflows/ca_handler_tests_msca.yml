@@ -1228,6 +1228,51 @@ jobs:
       run: |
         docker exec acme-srv grep -i "either CN or SANs are not allowed by configuration" /var/log/messages
 
+    - name: "KRB ACME Profiling - Setup a2c with mscertsrv_ca_handler using kerberos"
+      run: |
+        mkdir -p data/acme_ca
+        sudo cp test/ca/certsrv_ca_certs.pem data/acme_ca/ca_certs.pem
+        sudo touch data/acme_srv.cfg
+        sudo chmod 777 data/acme_srv.cfg
+        sudo head -n -8 .github/openssl_ca_handler.py_acme_srv_default_handler.cfg > data/acme_srv.cfg
+        sudo echo "handler_file: /opt/acme2certifier/examples/ca_handler/mscertsrv_ca_handler.py" >> data/acme_srv.cfg
+        sudo echo "host: $WCCE_FQDN" >> data/acme_srv.cfg
+        sudo echo "user: $WES_USER" >> data/acme_srv.cfg
+        sudo echo "password: $WES_PASSWORD" >> data/acme_srv.cfg
+        sudo echo "auth_method: gssapi" >> data/acme_srv.cfg
+        sudo echo "template: $WES_TEMPLATE" >> data/acme_srv.cfg
+        sudo echo "ca_bundle: volume/acme_ca/ca_certs.pem" >> data/acme_srv.cfg
+        sudo echo "krb5_config: volume/acme_ca/krb5.conf" >> data/acme_srv.cfg
+        sudo echo "verify: False" >> data/acme_srv.cfg
+        sudo echo "request_timeout: 30" >> data/acme_srv.cfg
+        sudo sed -i "s/tnauthlist_support: False/tnauthlist_support: False\nprofiles={\"WebServerModified\": \"http:\/\/foo.bar\/acmeca1\", \"WebServer\": \"http:\/\/foo.bar\/acmeca2\", \"profile3\": \"http:\/\/foo.bar\/profile3\"}/g" data/acme_srv.cfg
+        sudo sed -i "s/revocation_reason_check_disable: False/revocation_reason_check_disable: False\nenrollment_timeout: 40/g" data/acme_srv.cfg
+
+        sudo touch data/acme_ca/krb5.conf
+        sudo chmod 777 data/acme_ca/krb5.conf
+        cat <<EOF > data/acme_ca/krb5.conf
+        $WES_KRB5_CONF
+        EOF
+
+      env:
+        WES_HOST: ${{ secrets.WES_HOST }}
+        WES_USER: ${{ secrets.WES_USER }}
+        WES_PASSWORD: ${{ secrets.WES_PASSWORD }}
+        WES_AUTHMETHOD: ${{ secrets.WES_AUTHMETHOD }}
+        WES_TEMPLATE: ${{ secrets.WES_TEMPLATE }}
+        WCCE_FQDN: ${{ secrets.WCCE_FQDN }}
+        WES_KRB5_CONF: ${{ secrets.WES_KRB5_CONF }}
+
+    - name: "KRB ACME Profiling - Reconfigure a2c "
+      run: |
+        docker exec acme-srv sh /tmp/acme2certifier/rpm_tester.sh restart
+
+    - name: "KRB ACME Profiling - Enrollment"
+      uses: ./.github/actions/wf_specific/ms_ca_handler/enroll_acmeprofile
+      with:
+        NAME_SPACE: local
+        DEPLOYMENT_TYPE: rpm
+
     - name: "[ * ] collecting test logs"
       if: ${{ failure() }}
       run: |
@@ -1354,6 +1399,69 @@ jobs:
       uses: ./.github/actions/wf_specific/ms_ca_handler/enroll_eab
       with:
         NAME_SPACE: local
+
+    - name: "EAB ACME Profiling - Setup a2c with ms_wcce_ca_handler (Kerboros)"
+      run: |
+        mkdir -p data/acme_ca
+        sudo cp test/ca/certsrv_ca_certs.pem data/acme_ca/ca_certs.pem
+        sudo touch data/acme_srv.cfg
+        sudo chmod 777 data/acme_srv.cfg
+        sudo head -n -8 .github/openssl_ca_handler.py_acme_srv_default_handler.cfg > data/acme_srv.cfg
+        sudo echo "handler_file: /opt/acme2certifier/examples/ca_handler/mscertsrv_ca_handler.py" >> data/acme_srv.cfg
+        sudo echo "host: $WCCE_FQDN" >> data/acme_srv.cfg
+        sudo echo "user: $WES_USER" >> data/acme_srv.cfg
+        sudo echo "password: $WES_PASSWORD" >> data/acme_srv.cfg
+        sudo echo "auth_method: gssapi" >> data/acme_srv.cfg
+        sudo echo "template: $WES_TEMPLATE" >> data/acme_srv.cfg
+        sudo echo "ca_bundle: volume/acme_ca/ca_certs.pem" >> data/acme_srv.cfg
+        sudo echo "krb5_config: volume/acme_ca/krb5.conf" >> data/acme_srv.cfg
+        sudo echo "verify: False" >> data/acme_srv.cfg
+        sudo echo "request_timeout: 30" >> data/acme_srv.cfg
+        sudo echo "enrollment_config_log: True" >> data/acme_srv.cfg
+        sudo sed -i "s/tnauthlist_support: False/tnauthlist_support: False\nprofiles={\"WebServerModified\": \"http:\/\/foo.bar\/acmeca1\", \"WebServer\": \"http:\/\/foo.bar\/acmeca2\", \"profile3\": \"http:\/\/foo.bar\/profile3\"}/g" data/acme_srv.cfg
+        sudo sed -i "s/revocation_reason_check_disable: False/revocation_reason_check_disable: False\nenrollment_timeout: 40/g" data/acme_srv.cfg
+
+        sudo echo "eab_profiling: True" >> data/acme_srv.cfg
+        sudo echo -e "\n[EABhandler]" >> data/acme_srv.cfg
+        sudo echo "eab_handler_file: /opt/acme2certifier/examples/eab_handler/kid_profile_handler.py" >> data/acme_srv.cfg
+        sudo echo "key_file: /opt/acme2certifier/volume/acme_ca/kid_profiles.json" >> data/acme_srv.cfg
+
+        sudo cp examples/eab_handler/kid_profiles.json data/acme_ca/kid_profiles.json
+        sudo chmod 777 data/acme_ca/kid_profiles.json
+        sudo sed -i "s/\"profile_id\"\: \[\"profile_1\", \"profile_2\", \"profile_3\"\]/\"template\"\: \[\"WebServerModified\"\, \"WebServer\"]/g" data/acme_ca/kid_profiles.json
+        sudo sed -i "s/\"profile_id\"\: \"profile_2\"/\"template\"\: \"WebServerModified\"/g" data/acme_ca/kid_profiles.json
+        sudo sed -i "s/\"ca_name\": \"example_ca_2\",/\"unknown_key\": \"unknown_value\"/g" data/acme_ca/kid_profiles.json
+        sudo sed -i "s/\"ca_name\": \"example_ca\",/\"unknown_key\": \"unknown_value\"/g" data/acme_ca/kid_profiles.json
+        sudo sed -i "s/example.net/local/g" data/acme_ca/kid_profiles.json
+        sudo sed -i '18,19d' data/acme_ca/kid_profiles.json
+        sudo sed -i '8,9d' data/acme_ca/kid_profiles.json
+
+        sudo touch data/acme_ca/krb5.conf
+        sudo chmod 777 data/acme_ca/krb5.conf
+        cat <<EOF > data/acme_ca/krb5.conf
+        $WES_KRB5_CONF
+        EOF
+      env:
+        WES_HOST: ${{ secrets.WES_HOST }}
+        WES_USER: ${{ secrets.WES_USER }}
+        WES_PASSWORD: ${{ secrets.WES_PASSWORD }}
+        WES_AUTHMETHOD: ${{ secrets.WES_AUTHMETHOD }}
+        WES_TEMPLATE: ${{ secrets.WES_TEMPLATE }}
+        WCCE_FQDN: ${{ secrets.WCCE_FQDN }}
+        WES_KRB5_CONF: ${{ secrets.WES_KRB5_CONF }}
+
+    - name: "EAB ACME Profiling - Execute install scipt"
+      run: |
+        docker exec acme-srv sh /tmp/acme2certifier/rpm_tester.sh
+        docker exec acme-srv yum install -y krb5-libs
+
+    - name: "EAB ACME Profiling - Enrollment"
+      uses: ./.github/actions/wf_specific/ms_ca_handler/enroll_eab_acmeprofile
+      with:
+        NAME_SPACE: local
+        DEPLOYMENT_TYPE: rpm
+        TAIL_NUMBER: 1900
+
 
     - name: "[ * ] collecting test logs"
       if: ${{ failure() }}
