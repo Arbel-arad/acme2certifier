@@ -154,6 +154,7 @@ jobs:
       uses: ./.github/actions/wf_specific/ms_ca_handler/enroll_eab_acmeprofile
       with:
         NAME_SPACE: local
+        DEPLOYMENT_TYPE: container
 
     - name: "Check container configuration"
       uses: ./.github/actions/container_check
@@ -334,6 +335,8 @@ jobs:
 
     - name: "EAB ACME Profiling - Enrollment"
       uses: ./.github/actions/wf_specific/ms_ca_handler/enroll_eab_acmeprofile
+      with:
+        DEPLOYMENT_TYPE: container
 
     - name: "Check container configuration"
       uses: ./.github/actions/container_check
@@ -494,6 +497,7 @@ jobs:
       uses: ./.github/actions/wf_specific/ms_ca_handler/enroll_eab_acmeprofile
       with:
         NAME_SPACE: local
+        DEPOYMENT_TYPE: rpm
 
     - name: "[ * ] collecting test logs"
       if: ${{ failure() }}
@@ -659,6 +663,8 @@ jobs:
 
     - name: "EAB ACME Profiling - Enrollment"
       uses: ./.github/actions/wf_specific/ms_ca_handler/enroll_eab_acmeprofile
+      with:
+        DEPLOYMENT_TYPE: rpm
 
     - name: "[ * ] collecting test logs"
       if: ${{ failure() }}

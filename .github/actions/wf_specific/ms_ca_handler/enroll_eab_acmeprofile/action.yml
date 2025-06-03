@@ -5,6 +5,10 @@ inputs:
     description: "namespace"
     required: true
     default: "acme"
+  DEPLOYMENT_TYPE:
+    description: "Deployment type"
+    required: true
+    default: "rpm"
 
 runs:
   using: "composite"
