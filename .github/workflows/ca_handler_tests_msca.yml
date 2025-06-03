@@ -1683,8 +1683,6 @@ jobs:
         sudo echo "enrollment_config_log: True" >> data/acme_srv.cfg
         sudo sed -i "s/tnauthlist_support: False/tnauthlist_support: False\nprofiles={\"WebServerModified\": \"http:\/\/foo.bar\/acmeca1\", \"WebServer\": \"http:\/\/foo.bar\/acmeca2\", \"profile3\": \"http:\/\/foo.bar\/profile3\"}/g" data/acme_srv.cfg
         sudo sed -i "s/revocation_reason_check_disable: False/revocation_reason_check_disable: False\nenrollment_timeout: 40/g" data/acme_srv.cfg
-        cd examples/Docker/
-        docker-compose restart
       env:
         RUNNER_IP: ${{ env.RUNNER_IP }}
         DNSMASQ_IP: ${{ env.DNSMASQ_IP }}
