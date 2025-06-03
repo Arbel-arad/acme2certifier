@@ -749,6 +749,7 @@ jobs:
         sudo echo "allowed_domainlist: [\"*.acme\", \"foo1.bar\", \"*.bar.local\"]" >> examples/Docker/data/acme_srv.cfg
         cd examples/Docker/
         docker-compose restart
+
     - name: "KRB - enrollment allowed domainlist"
       uses: ./.github/actions/wf_specific/ms_ca_handler/enroll_allowed_domain_list
 
@@ -756,6 +757,7 @@ jobs:
       run: |
         cd examples/Docker
         docker-compose logs | grep "allowed_domainlist" | grep -i "either CN or SANs are not allowed by configuration"
+
     - name: "KRB ACME Profile - Setup a2c with ms_wcce_ca_handler"
       run: |
         sudo touch examples/Docker/data/ca_certs.pem
@@ -1611,9 +1613,7 @@ jobs:
     - name: "EAB ACME Profiling - Enrollment"
       uses: ./.github/actions/wf_specific/ms_ca_handler/enroll_eab_acmeprofile
       with:
-        NAME_SPACE: local
         DEPLOYMENT_TYPE: rpm
-        TAIL_NUMBER: 1900
 
     - name: "[ * ] collecting test logs"
       if: ${{ failure() }}
@@ -1831,13 +1831,12 @@ jobs:
 
     - name: "EAB ACME Profiling - Execute install scipt"
       run: |
-        docker exec acme-srv sh /tmp/acme2certifier/$EXEC_SCRIPT  restart
+        docker exec acme-srv sh /tmp/acme2certifier/rpm_tester.sh restart
 
     - name: "EAB ACME Profiling - Enrollment"
       uses: ./.github/actions/wf_specific/ms_ca_handler/enroll_eab_acmeprofile
       with:
         DEPLOYMENT_TYPE: rpm
-
 
     - name: "[ * ] collecting test logs"
       if: ${{ failure() }}
