@@ -1245,6 +1245,7 @@ jobs:
         sudo echo "krb5_config: volume/acme_ca/krb5.conf" >> data/acme_srv.cfg
         sudo echo "verify: False" >> data/acme_srv.cfg
         sudo echo "request_timeout: 30" >> data/acme_srv.cfg
+        sudo echo "enrollment_config_log: True" >> data/acme_srv.cfg
         sudo sed -i "s/tnauthlist_support: False/tnauthlist_support: False\nprofiles={\"WebServerModified\": \"http:\/\/foo.bar\/acmeca1\", \"WebServer\": \"http:\/\/foo.bar\/acmeca2\", \"profile3\": \"http:\/\/foo.bar\/profile3\"}/g" data/acme_srv.cfg
         sudo sed -i "s/revocation_reason_check_disable: False/revocation_reason_check_disable: False\nenrollment_timeout: 40/g" data/acme_srv.cfg
 
@@ -1669,7 +1670,7 @@ jobs:
         sudo touch data/acme_srv.cfg
         sudo chmod 777 data/acme_srv.cfg
         sudo head -n -8 .github/openssl_ca_handler.py_acme_srv_default_handler.cfg > data/acme_srv.cfg
-        sudo echo "handler_file: /var/www/acme2certifier/examples/ca_handler/mswcce_ca_handler.py" >> data/acme_srv.cfg
+        sudo echo "handler_file: /opt/acme2certifier/examples/ca_handler/mswcce_ca_handler.py" >> data/acme_srv.cfg
         sudo echo "host: $WCCE_FQDN" >> data/acme_srv.cfg
         sudo echo "user: $WCCE_USER" >> data/acme_srv.cfg
         sudo echo "password: $WCCE_PASSWORD" >> data/acme_srv.cfg
