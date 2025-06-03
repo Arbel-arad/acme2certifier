@@ -500,7 +500,7 @@ jobs:
       uses: ./.github/actions/wf_specific/ms_ca_handler/enroll_eab_acmeprofile
       with:
         NAME_SPACE: local
-        DEPOYMENT_TYPE: rpm
+        DEPLOYMENT_TYPE: rpm
         TAIL_NUMBER: 1500
 
     - name: "[ * ] collecting test logs"
