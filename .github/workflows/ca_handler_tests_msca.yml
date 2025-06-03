@@ -1557,9 +1557,6 @@ jobs:
 
     - name: "ACME Profiling - Setup a2c with ms_wcce_ca_handler (Kerboros)"
       run: |
-        sudo touch examples/Docker/data/ca_certs.pem
-        sudo chmod 777 examples/Docker/data/ca_certs.pem
-        sudo echo "$WCCE_CA_BUNDLE" > examples/Docker/data/ca_certs.pem
         sudo touch examples/Docker/data/acme_srv.cfg
         sudo chmod 777 examples/Docker/data/acme_srv.cfg
         sudo head -n -8 .github/openssl_ca_handler.py_acme_srv_default_handler.cfg > examples/Docker/data/acme_srv.cfg
