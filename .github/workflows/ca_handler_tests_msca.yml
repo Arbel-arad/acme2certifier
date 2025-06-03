@@ -1557,20 +1557,21 @@ jobs:
 
     - name: "ACME Profiling - Setup a2c with ms_wcce_ca_handler (Kerboros)"
       run: |
-        sudo touch examples/Docker/data/acme_srv.cfg
-        sudo chmod 777 examples/Docker/data/acme_srv.cfg
-        sudo head -n -8 .github/openssl_ca_handler.py_acme_srv_default_handler.cfg > examples/Docker/data/acme_srv.cfg
+        sudo touch data/acme_ca/ca_certs.pem
+        sudo chmod 777 data/acme_ca/ca_certs.pem
+        sudo head -n -8 .github/openssl_ca_handler.py_acme_srv_default_handler.cfg > data/acme_ca/ca_certs.pem
         sudo echo "handler_file: /var/www/acme2certifier/examples/ca_handler/mswcce_ca_handler.py" >> examples/Docker/data/acme_srv.cfg
         sudo echo "host: $WCCE_FQDN" >> examples/Docker/data/acme_srv.cfg
         sudo echo "user: $WCCE_USER" >> examples/Docker/data/acme_srv.cfg
-        sudo echo "password: $WCCE_PASSWORD" >> examples/Docker/data/acme_srv.cfg
-        sudo echo "template: $WCCE_TEMPLATE" >> examples/Docker/data/acme_srv.cfg
-        sudo echo "ca_name: $WCCE_CA_NAME" >> examples/Docker/data/acme_srv.cfg
-        sudo echo "target_domain: $WCCE_ADS_DOMAIN" >> examples/Docker/data/acme_srv.cfg
-        sudo echo "domain_controller: $RUNNER_IP" >> examples/Docker/data/acme_srv.cfg
-        sudo echo "ca_bundle: volume/ca_certs.pem" >> examples/Docker/data/acme_srv.cfg
-        sudo echo "timeout: 20" >> examples/Docker/data/acme_srv.cfg
-        sudo echo "use_kerberos: True" >> examples/Docker/data/acme_srv.cfg
+        sudo echo "password: $WCCE_PASSWORD" >> data/acme_ca/ca_certs.pem
+        sudo echo "template: $WCCE_TEMPLATE" >> data/acme_ca/ca_certs.pem
+        sudo echo "ca_name: $WCCE_CA_NAME" >> data/acme_ca/ca_certs.pem
+        sudo echo "target_domain: $WCCE_ADS_DOMAIN" >> data/acme_ca/ca_certs.pem
+        sudo echo "domain_controller: $RUNNER_IP" >> data/acme_ca/ca_certs.pem
+        sudo echo "ca_bundle: volume/ca_certs.pem" >> data/acme_ca/ca_certs.pem
+        sudo echo "timeout: 20" >> data/acme_ca/ca_certs.pem
+        sudo echo "use_kerberos: True" >> data/acme_ca/ca_certs.pem
+        sudo echo "enrollment_config_log: True" >> data/acme_srv.cfg
         sudo sed -i "s/tnauthlist_support: False/tnauthlist_support: False\nprofiles={\"WebServerModified\": \"http:\/\/foo.bar\/acmeca1\", \"WebServer\": \"http:\/\/foo.bar\/acmeca2\", \"profile3\": \"http:\/\/foo.bar\/profile3\"}/g" data/acme_srv.cfg
         sudo sed -i "s/revocation_reason_check_disable: False/revocation_reason_check_disable: False\nenrollment_timeout: 40/g" examples/Docker/data/acme_srv.cfg
         cd examples/Docker/
