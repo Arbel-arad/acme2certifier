@@ -89,6 +89,13 @@ jobs:
         WCCE_SSH_ACCESS_KEY: ${{ secrets.WCCE_SSH_ACCESS_KEY }}
         NAME_SPACE: local
 
+    #- name: "Check container configuration"
+    #  uses: ./.github/actions/container_check
+    #  with:
+    #    DB_HANDLER: ${{ matrix.dbhandler }}
+    #    WEB_SRV: ${{ matrix.websrv }}
+
+
     - name: "EAB ACME Profiling - Setup a2c with ms_wcce_ca_handler (Kerboros)"
       run: |
         sudo touch examples/Docker/data/ca_certs.pem
@@ -156,11 +163,7 @@ jobs:
         NAME_SPACE: local
         DEPLOYMENT_TYPE: container
 
-    - name: "Check container configuration"
-      uses: ./.github/actions/container_check
-      with:
-        DB_HANDLER: ${{ matrix.dbhandler }}
-        WEB_SRV: ${{ matrix.websrv }}
+
 
     - name: "[ * ] collecting test logs"
       if: ${{ failure() }}
@@ -274,6 +277,12 @@ jobs:
         WCCE_FQDN: ${{ secrets.WCCE_FQDN }}
         WCCE_SSH_KNOWN_HOSTS: ${{ secrets.WCCE_SSH_KNOWN_HOSTS }}
         WCCE_SSH_ACCESS_KEY: ${{ secrets.WCCE_SSH_ACCESS_KEY }}
+
+    #- name: "Check container configuration"
+    #  uses: ./.github/actions/container_check
+    #  with:
+    #    DB_HANDLER: ${{ matrix.dbhandler }}
+    #    WEB_SRV: ${{ matrix.websrv }}
 
     - name: "EAB ACME Profiling - Setup a2c with ms_wcce_ca_handler (Kerboros)"
       run: |
