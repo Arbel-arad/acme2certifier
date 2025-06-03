@@ -501,6 +501,7 @@ jobs:
       with:
         NAME_SPACE: local
         DEPOYMENT_TYPE: rpm
+        TAIL_NUMBER: 1500
 
     - name: "[ * ] collecting test logs"
       if: ${{ failure() }}
