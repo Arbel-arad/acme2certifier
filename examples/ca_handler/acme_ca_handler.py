@@ -772,7 +772,7 @@ class CAhandler(object):
         code = 500
         message = "urn:ietf:params:acme:error:serverInternal"
         detail = None
-
+        self.logger.debug("cert: %s", _cert)
         try:
             cert = x509.load_der_x509_certificate(
                 b64_decode(self.logger, _cert), backend=default_backend()
