@@ -773,68 +773,68 @@ class CAhandler(object):
         message = "urn:ietf:params:acme:error:serverInternal"
         detail = None
         self.logger.debug("cert: %s", _cert)
-        try:
-            cert = x509.load_der_x509_certificate(
-                b64_url_decode(self.logger, _cert), backend=default_backend()
+        # try:
+        cert = x509.load_der_x509_certificate(
+            b64_url_decode(self.logger, _cert), backend=default_backend()
+        )
+        if os.path.exists(self.acme_keyfile):
+            user_key = self._user_key_load()
+        net = client.ClientNetwork(user_key)
+
+        if user_key:
+            directory = messages.Directory.from_json(
+                net.get(f"{self.acme_url}{self.path_dic['directory_path']}").json()
             )
-            if os.path.exists(self.acme_keyfile):
-                user_key = self._user_key_load()
-            net = client.ClientNetwork(user_key)
+            acmeclient = client.ClientV2(directory, net=net)
+            reg = messages.NewRegistration.from_data(
+                key=user_key,
+                email=self.email,
+                terms_of_service_agreed=True,
+                only_return_existing=True,
+            )
 
-            if user_key:
-                directory = messages.Directory.from_json(
-                    net.get(f"{self.acme_url}{self.path_dic['directory_path']}").json()
+            if not self.account:
+                self._account_lookup(acmeclient, reg, directory)
+
+            if self.account:
+                regr = messages.RegistrationResource(
+                    uri=f"{self.acme_url}{self.path_dic['acct_path']}{self.account}",
+                    body=reg,
                 )
-                acmeclient = client.ClientV2(directory, net=net)
-                reg = messages.NewRegistration.from_data(
-                    key=user_key,
-                    email=self.email,
-                    terms_of_service_agreed=True,
-                    only_return_existing=True,
+                self.logger.debug(
+                    "CAhandler.revoke() checking remote registration status"
                 )
+                regr = acmeclient.query_registration(regr)
 
-                if not self.account:
-                    self._account_lookup(acmeclient, reg, directory)
-
-                if self.account:
-                    regr = messages.RegistrationResource(
-                        uri=f"{self.acme_url}{self.path_dic['acct_path']}{self.account}",
-                        body=reg,
-                    )
-                    self.logger.debug(
-                        "CAhandler.revoke() checking remote registration status"
-                    )
-                    regr = acmeclient.query_registration(regr)
-
-                    if regr.body.status == "valid":
-                        self.logger.debug("CAhandler.revoke() issuing revocation order")
-                        acmeclient.revoke(cert, 1)
-                        self.logger.debug("CAhandler.revoke() successfull")
-                        code = 200
-                        message = None
-                    else:
-                        self.logger.error(
-                            "CAhandler.enroll: Bad ACME account: %s", regr.body.error
-                        )
-                        detail = f"Bad ACME account: {regr.body.error}"
-
+                if regr.body.status == "valid":
+                    self.logger.debug("CAhandler.revoke() issuing revocation order")
+                    acmeclient.revoke(cert, 1)
+                    self.logger.debug("CAhandler.revoke() successfull")
+                    code = 200
+                    message = None
                 else:
                     self.logger.error(
-                        "CAhandler.revoke(): could not find account key and lookup at acme-endpoint failed."
+                        "CAhandler.enroll: Bad ACME account: %s", regr.body.error
                     )
-                    detail = "account lookup failed"
+                    detail = f"Bad ACME account: {regr.body.error}"
+
             else:
                 self.logger.error(
-                    "CAhandler.revoke(): could not load user_key %s", self.acme_keyfile
+                    "CAhandler.revoke(): could not find account key and lookup at acme-endpoint failed."
                 )
-                detail = "Internal Error"
+                detail = "account lookup failed"
+        else:
+            self.logger.error(
+                "CAhandler.revoke(): could not load user_key %s", self.acme_keyfile
+            )
+            detail = "Internal Error"
 
-        except Exception as err:
-            self.logger.error("CAhandler.revoke: error: %s", err)
-            detail = str(err)
+        #except Exception as err:
+        #    self.logger.error("CAhandler.revoke: error: %s", err)
+        #    detail = str(err)
 
-        finally:
-            del user_key
+        #finally:
+        #    del user_key
 
         self.logger.debug("Certificate.revoke() ended")
         return (code, message, detail)
