@@ -422,11 +422,15 @@ class CAhandler(object):
         if self.host:
 
             # check for eab profiling and header_info
-            error = eab_profile_header_info_check(self.logger, self, csr, "cert_profile_name")
+            error = eab_profile_header_info_check(
+                self.logger, self, csr, "cert_profile_name"
+            )
 
             if not error:
                 # check for allowed domainlist
-                error = allowed_domainlist_check(self.logger, csr, self.allowed_domainlist)
+                error = allowed_domainlist_check(
+                    self.logger, csr, self.allowed_domainlist
+                )
 
             if not error:
                 # prepare the CSR to be signed

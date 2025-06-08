@@ -18,9 +18,9 @@ from acme_srv.db_handler import DBstore
 from acme_srv.helper import (
     load_config,
     allowed_domainlist_check,
-    b64_decode,
     b64_encode,
     b64_url_recode,
+    b64_url_decode,
     client_parameter_validate,
     config_allowed_domainlist_load,
     config_eab_profile_load,
@@ -775,7 +775,7 @@ class CAhandler(object):
         self.logger.debug("cert: %s", _cert)
         try:
             cert = x509.load_der_x509_certificate(
-                b64_decode(self.logger, _cert), backend=default_backend()
+                b64_url_decode(self.logger, _cert), backend=default_backend()
             )
             if os.path.exists(self.acme_keyfile):
                 user_key = self._user_key_load()
@@ -830,7 +830,7 @@ class CAhandler(object):
                 detail = "Internal Error"
 
         except Exception as err:
-            self.logger.error("CAhandler.enroll: error: %s", err)
+            self.logger.error("CAhandler.revoke: error: %s", err)
             detail = str(err)
 
         finally:
