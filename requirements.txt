@@ -10,7 +10,7 @@ python-dateutil
 requests
 pysocks
 josepy
-acme
+acme>=4.0.0
 xmltodict
 pyasn1
 pyasn1_modules
