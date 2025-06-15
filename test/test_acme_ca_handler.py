@@ -4,11 +4,10 @@
 # pylint: disable=C0415, R0904, R0913, W0212
 import sys
 import os
+import josepy
 import unittest
 from unittest.mock import patch, mock_open, Mock, MagicMock
 import configparser
-
-# from OpenSSL import crypto
 
 sys.path.insert(0, ".")
 sys.path.insert(1, "..")
@@ -1139,8 +1138,8 @@ class TestACMEHandler(unittest.TestCase):
             "ERROR:test_a2c:CAhandler.enroll: account registration failed", lcm.output
         )
 
-    @patch("OpenSSL.crypto.load_certificate")
-    @patch("OpenSSL.crypto.dump_certificate")
+    @patch("examples.ca_handler.acme_ca_handler.b64_encode")
+    @patch("examples.ca_handler.acme_ca_handler.cert_pem2der")
     @patch("examples.ca_handler.acme_ca_handler.CAhandler._challenge_store")
     @patch("examples.ca_handler.acme_ca_handler.CAhandler._challenge_info")
     @patch("examples.ca_handler.acme_ca_handler.CAhandler._account_register")
@@ -1161,8 +1160,8 @@ class TestACMEHandler(unittest.TestCase):
         mock_reg,
         mock_cinfo,
         mock_store,
-        mock_dumpcert,
-        mock_loadcert,
+        mock_pem2der,
+        mock_encode,
     ):
         """test enroll with no account configured"""
         mock_key.return_value = "key"
@@ -1179,10 +1178,10 @@ class TestACMEHandler(unittest.TestCase):
         resp_pof = Mock()
         resp_pof.fullchain_pem = "fullchain"
         mock_pof.return_value = resp_pof
-        mock_dumpcert.return_value = b"mock_dumpcert"
-        mock_loadcert.return_value = "mock_loadcert"
+        mock_pem2der.return_value = "mock_pem2der"
+        mock_encode.return_value = "mock_encode"
         self.assertEqual(
-            (None, "fullchain", "bW9ja19kdW1wY2VydA==", None),
+            (None, "fullchain", "mock_encode", None),
             self.cahandler.enroll("csr"),
         )
         self.assertTrue(mock_store.called)
@@ -1190,8 +1189,8 @@ class TestACMEHandler(unittest.TestCase):
         self.assertTrue(mock_reg.called)
 
     @patch("examples.ca_handler.acme_ca_handler.allowed_domainlist_check")
-    @patch("OpenSSL.crypto.load_certificate")
-    @patch("OpenSSL.crypto.dump_certificate")
+    @patch("examples.ca_handler.acme_ca_handler.b64_encode")
+    @patch("examples.ca_handler.acme_ca_handler.cert_pem2der")
     @patch("examples.ca_handler.acme_ca_handler.CAhandler._challenge_store")
     @patch("examples.ca_handler.acme_ca_handler.CAhandler._challenge_info")
     @patch("acme.client.ClientV2.query_registration")
@@ -1212,8 +1211,8 @@ class TestACMEHandler(unittest.TestCase):
         mock_reg,
         mock_cinfo,
         mock_store,
-        mock_dumpcert,
-        mock_loadcert,
+        mock_pem2der,
+        mock_encode,
         mock_csrchk,
     ):
         """test enroll with existing account"""
@@ -1232,11 +1231,11 @@ class TestACMEHandler(unittest.TestCase):
         resp_pof = Mock()
         resp_pof.fullchain_pem = "fullchain"
         mock_pof.return_value = resp_pof
-        mock_dumpcert.return_value = b"mock_dumpcert"
-        mock_loadcert.return_value = "mock_loadcert"
+        mock_pem2der.return_value = "mock_pem2der"
+        mock_encode.return_value = "mock_encode"
         mock_csrchk.return_value = False
         self.assertEqual(
-            (None, "fullchain", "bW9ja19kdW1wY2VydA==", None),
+            (None, "fullchain", "mock_encode", None),
             self.cahandler.enroll("csr"),
         )
         self.assertTrue(mock_store.called)
@@ -1587,14 +1586,12 @@ class TestACMEHandler(unittest.TestCase):
     @patch("acme.messages")
     @patch("acme.client.ClientNetwork")
     @patch("builtins.open", mock_open(read_data="mock_open"), create=True)
-    @patch("josepy.ComparableX509")
-    @patch("OpenSSL.crypto.load_certificate")
+    @patch("cryptography.x509.load_der_x509_certificate")
     @patch("os.path.exists")
     def test_070_revoke(
         self,
         mock_exists,
         mock_load,
-        mock_comp,
         mock_nw,
         mock_mess,
         mock_reg,
@@ -1605,6 +1602,7 @@ class TestACMEHandler(unittest.TestCase):
         self.cahandler.acme_keyfile = "keyfile"
         self.cahandler.account = "account"
         mock_exists.return_value = True
+        mock_load.return_value = "mock_load_cert"
         response = Mock()
         response.body.status = "valid"
         mock_reg.return_value = response
@@ -1613,7 +1611,6 @@ class TestACMEHandler(unittest.TestCase):
         )
         self.assertTrue(mock_key.called)
         self.assertTrue(mock_load.called)
-        self.assertTrue(mock_comp.called)
         self.assertTrue(mock_nw.called)
         self.assertTrue(mock_revoke.called)
 
@@ -1623,14 +1620,12 @@ class TestACMEHandler(unittest.TestCase):
     @patch("acme.messages")
     @patch("acme.client.ClientNetwork")
     @patch("builtins.open", mock_open(read_data="mock_open"), create=True)
-    @patch("josepy.ComparableX509")
-    @patch("OpenSSL.crypto.load_certificate")
+    @patch("cryptography.x509.load_der_x509_certificate")
     @patch("os.path.exists")
     def test_071_revoke(
         self,
         mock_exists,
         mock_load,
-        mock_comp,
         mock_nw,
         mock_mess,
         mock_reg,
@@ -1641,6 +1636,7 @@ class TestACMEHandler(unittest.TestCase):
         self.cahandler.acme_keyfile = "keyfile"
         self.cahandler.account = "account"
         mock_exists.return_value = True
+        mock_load.return_value = "mock_load_cert"
         response = Mock()
         response.body.status = "invalid"
         response.body.error = "error"
@@ -1654,8 +1650,7 @@ class TestACMEHandler(unittest.TestCase):
             self.cahandler.revoke("cert", "reason", "date"),
         )
         self.assertTrue(mock_key.called)
-        self.assertTrue(mock_load.called)
-        self.assertTrue(mock_comp.called)
+        self.assertFalse(mock_load.called)
         self.assertTrue(mock_nw.called)
         self.assertFalse(mock_revoke.called)
 
@@ -1664,14 +1659,12 @@ class TestACMEHandler(unittest.TestCase):
     @patch("acme.messages")
     @patch("acme.client.ClientNetwork")
     @patch("builtins.open", mock_open(read_data="mock_open"), create=True)
-    @patch("josepy.ComparableX509")
-    @patch("OpenSSL.crypto.load_certificate")
+    @patch("cryptography.x509.load_der_x509_certificate")
     @patch("os.path.exists")
     def test_072_revoke(
         self,
         mock_exists,
         mock_load,
-        mock_comp,
         mock_nw,
         mock_mess,
         mock_lookup,
@@ -1680,14 +1673,14 @@ class TestACMEHandler(unittest.TestCase):
         """test revoke account lookup failed"""
         self.cahandler.acme_keyfile = "keyfile"
         mock_exists.return_value = True
+        mock_load.return_value = "mock_load_cert"
         self.assertEqual(
             (500, "urn:ietf:params:acme:error:serverInternal", "account lookup failed"),
             self.cahandler.revoke("cert", "reason", "date"),
         )
         self.assertTrue(mock_lookup.called)
         self.assertTrue(mock_key.called)
-        self.assertTrue(mock_load.called)
-        self.assertTrue(mock_comp.called)
+        self.assertFalse(mock_load.called)
         self.assertTrue(mock_nw.called)
 
     @patch("examples.ca_handler.acme_ca_handler.CAhandler._account_lookup")
@@ -1695,14 +1688,12 @@ class TestACMEHandler(unittest.TestCase):
     @patch("acme.client.ClientNetwork")
     @patch("josepy.JWKRSA")
     @patch("builtins.open", mock_open(read_data="mock_open"), create=True)
-    @patch("josepy.ComparableX509")
-    @patch("OpenSSL.crypto.load_certificate")
+    @patch("cryptography.x509.load_der_x509_certificate")
     @patch("os.path.exists")
     def test_073_revoke(
         self,
         mock_exists,
         mock_load,
-        mock_comp,
         mock_kload,
         mock_nw,
         mock_mess,
@@ -1711,6 +1702,7 @@ class TestACMEHandler(unittest.TestCase):
         """test revoke user key load failed"""
         self.cahandler.acme_keyfile = "keyfile"
         mock_exists.return_value = False
+        mock_load.return_value = "mock_load_cert"
         with self.assertLogs("test_a2c", level="INFO") as lcm:
             self.assertEqual(
                 (500, "urn:ietf:params:acme:error:serverInternal", "Internal Error"),
@@ -1723,11 +1715,12 @@ class TestACMEHandler(unittest.TestCase):
         )
 
     @patch("builtins.open", mock_open(read_data="mock_open"), create=True)
-    @patch("josepy.ComparableX509")
-    @patch("OpenSSL.crypto.load_certificate")
-    def test_074_revoke(self, mock_load, mock_comp):
+    @patch("examples.ca_handler.acme_ca_handler.CAhandler._user_key_load")
+    @patch("os.path.exists")
+    def test_074_revoke(self, mock_exists, mock_load):
         """test revoke exception during processing"""
         self.cahandler.acme_keyfile = "keyfile"
+        mock_exists.return_value = True
         mock_load.side_effect = Exception("ex_user_key_load")
         with self.assertLogs("test_a2c", level="INFO") as lcm:
             self.assertEqual(
@@ -1735,7 +1728,7 @@ class TestACMEHandler(unittest.TestCase):
                 self.cahandler.revoke("cert", "reason", "date"),
             )
         self.assertIn(
-            "ERROR:test_a2c:CAhandler.enroll: error: ex_user_key_load", lcm.output
+            "ERROR:test_a2c:CAhandler.revoke: error: ex_user_key_load", lcm.output
         )
 
     @patch("requests.post")
@@ -1895,7 +1888,7 @@ class TestACMEHandler(unittest.TestCase):
                 ),
             )
         self.assertIn(
-            "ERROR:test_a2c:CAhandler._eab_profile_list_check(): acme_keypath is missing in config",
+            "ERROR:test_a2c:CAhandler._eab_profile_list_set(): acme_keypath is missing in config",
             lcm.output,
         )
 
@@ -2097,6 +2090,72 @@ class TestACMEHandler(unittest.TestCase):
         self.assertEqual(
             "/foo/foo", self.cahandler._accountname_get(url, acme_url, path_dic)
         )
+
+    def test_102_order_new(self):
+        """test order_new"""
+        acmeclient = Mock()
+        acmeclient.new_order = Mock(return_value="new_order")
+        csr = "csr"
+        self.assertEqual(
+            "new_order", self.cahandler._order_new(acmeclient, "user_key", "csr")
+        )
+        self.assertTrue(acmeclient.new_order.called)
+        acmeclient.new_order.assert_called_with(csr_pem="csr")
+
+    def test_103_order_new(self):
+        """test order_new"""
+        acmeclient = Mock()
+        acmeclient.new_order = Mock(return_value="new_order")
+        csr = "csr"
+        self.cahandler.profile = "profile"
+        self.assertEqual(
+            "new_order", self.cahandler._order_new(acmeclient, "user_key", "csr")
+        )
+        self.assertTrue(acmeclient.new_order.called)
+        acmeclient.new_order.assert_called_with(csr_pem="csr", profile="profile")
+
+    def test_104_order_new(self):
+        """test order_new"""
+        acmeclient = Mock()
+        acmeclient.new_order.side_effect = [Exception("mock_new"), "new_order"]
+        csr = "csr"
+        with self.assertLogs("test_a2c", level="INFO") as lcm:
+            self.assertEqual(
+                "new_order",
+                self.cahandler._order_new(acmeclient, "user_key", "csr_pem"),
+            )
+        self.assertIn(
+            "ERROR:test_a2c:CAhandler._order_new() failed to create order: mock_new. Try without profile information.",
+            lcm.output,
+        )
+
+    @patch("examples.ca_handler.acme_ca_handler.b64_url_decode")
+    @patch("OpenSSL.crypto.load_certificate")
+    @patch("cryptography.x509.load_der_x509_certificate")
+    def test_105_revoke_or_fallback(self, mock_cry_load, mock_ossl_load, mock_b64):
+        """test _revoke_or_fallback without fallback to OpenSSL crypto load"""
+        acmeclient = Mock()
+        self.assertFalse(self.cahandler._revoke_or_fallback(acmeclient, "cert"))
+        self.assertTrue(mock_b64.called)
+        self.assertTrue(mock_cry_load.called)
+        self.assertFalse(mock_ossl_load.called)
+
+    @patch.object(josepy, "ComparableX509", create=True)
+    @patch("examples.ca_handler.acme_ca_handler.b64_url_decode")
+    @patch("OpenSSL.crypto.load_certificate")
+    @patch("cryptography.x509.load_der_x509_certificate")
+    def test_106_revoke_or_fallback(
+        self, mock_cry_load, mock_ossl_load, mock_b64, mock_comparable
+    ):
+        """test _revoke_or_fallback with fallbnack to OpenSSL crypto load"""
+        mock_comparable.return_value = "comparable_cert"
+        acmeclient = Mock()
+        acmeclient.revoke = Mock(side_effect=[Exception("mock_revoke"), "foo"])
+        self.assertFalse(self.cahandler._revoke_or_fallback(acmeclient, "cert"))
+        self.assertTrue(mock_b64.called)
+        self.assertTrue(mock_cry_load.called)
+        self.assertTrue(mock_ossl_load.called)
+        self.assertTrue(mock_comparable.called)
 
 
 if __name__ == "__main__":
