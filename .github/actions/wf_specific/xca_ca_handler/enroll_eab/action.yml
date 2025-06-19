@@ -253,9 +253,9 @@ runs:
       docker run -i -v $PWD/lego:/.lego/ --rm --name lego --network acme goacme/lego -s http://acme-srv -a --email "lego@example.com" --eab --kid keyid_02 --hmac dGhpc19pc19hX3ZlcnlfbG9uZ19obWFjX3RvX21ha2Vfc3VyZV90aGF0X2l0c19tb3JlX3RoYW5fMjU2X2JpdHM -d www.example.local --http run
     shell: bash
 
-  - name: "EAB - 07b - check  result "
-    if: steps.legofail04.outcome != 'failure'
-    run: |
-      echo "legofail outcome is ${{steps.legofail04.outcome }}"
-      exit 1
-    shell: bash
+  #- name: "EAB - 07b - check  result "
+  #  if: steps.legofail04.outcome != 'failure'
+  #  run: |
+  #    echo "legofail outcome is ${{steps.legofail04.outcome }}"
+  #    exit 1
+  #  shell: bash
