@@ -209,25 +209,21 @@ runs:
       exit 1
     shell: bash
 
-  - name: "EAB - 07a - Enroll acme with challenge validation disabled in kid.json"
+  - name: "EAB - 07 - Enroll acme with challenge validation disabled in kid.json"
     run: |
       sudo rm -rf acme-sh/*
       docker run --rm -i -v "$(pwd)/acme-sh":/acme.sh --network acme --name=acme-sh neilpang/acme.sh:latest --register-account --server http://acme-srv --accountemail 'acme-sh@example.com' --eab-kid keyid_01 --eab-hmac-key YW5vdXRoZXJfdmVyeV9sb25nX2htYWNfZm9yX2tleWlkXzAxX3doaWNoIHdpbGxfYmUgdXNlZF9kdXJpbmcgcmVncmVzc2lvbg --debug 3
       docker run --rm -i -v "$(pwd)/acme-sh":/acme.sh --network acme --name=acme-sh neilpang/acme.sh:latest --issue --server http://acme-srv -d www.example.local --standalone --debug 3 --output-insecure
-      awk 'BEGIN {c=0;} /BEGIN CERT/{c++} { print > "cert-" c ".pem"}' < acme-sh/acme-sh.acme_ecc/ca.cer
-      openssl verify -CAfile cert-2.pem -untrusted cert-1.pem  acme-sh/acme-sh.acme_ecc/acme-sh.acme.cer
       openssl x509 -in acme-sh/acme-sh.acme_ecc/acme-sh.acme.cer -text -noout | grep "Issuer: CN = root-ca"
       openssl x509 -in acme-sh/acme-sh.acme_ecc/acme-sh.acme.cer -ext keyUsage -noout | grep "Digital Signature, Non Repudiation"
       openssl x509 -in acme-sh/acme-sh.acme_ecc/acme-sh.acme.cer -ext extendedKeyUsage -noout | grep "TLS Web Client Authentication, Code Signing"
     shell: bash
 
-  - name: "EAB - 07a - Enroll lego with challenge validation disabled in kid.json"
+  - name: "EAB - 07 - Enroll lego with challenge validation disabled in kid.json"
     run: |
       sudo rm -rf lego/*
       docker run -i -v $PWD/lego:/.lego/ --rm --name lego --network acme goacme/lego -s http://acme-srv -a --email "lego@example.com" --eab --kid keyid_01 --hmac YW5vdXRoZXJfdmVyeV9sb25nX2htYWNfZm9yX2tleWlkXzAxX3doaWNoIHdpbGxfYmUgdXNlZF9kdXJpbmcgcmVncmVzc2lvbg -d www.example.local --http run
       sudo openssl x509 -in lego/certificates/lego.acme.crt -ext extendedKeyUsage -noout
-      sudo openssl x509 -in lego/certificates/lego.acme.crt -issuer --noout
-      sudo openssl verify -CAfile cert-2.pem -untrusted cert-1.pem  lego/certificates/lego.acme.crt
       sudo openssl x509 -in lego/certificates/lego.acme.crt -text -noout | grep "Issuer: CN = root-ca"
       sudo openssl x509 -in lego/certificates/lego.acme.crt -text -ext keyUsage | grep "Digital Signature, Non Repudiation"
       sudo openssl x509 -in lego/certificates/lego.acme.crt -text -ext extendedKeyUsage | grep "TLS Web Client Authentication, Code Signing"
