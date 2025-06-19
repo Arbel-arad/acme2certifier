@@ -230,7 +230,7 @@ runs:
     shell: bash
 
   - name: "EAB - 07b - Enroll acme - challenge validations fails"
-    id: acmefail04
+    id: acmefail07
     continue-on-error: true
     run: |
       sudo rm -rf acme-sh/*
@@ -239,14 +239,14 @@ runs:
     shell: bash
 
   - name: "EAB - 07b - check  result "
-    if: steps.acmefail04.outcome != 'failure'
+    if: steps.acmefail07.outcome != 'failure'
     run: |
-      echo "acmefail outcome is ${{steps.acmefail04.outcome }}"
+      echo "acmefail outcome is ${{steps.acmefail07.outcome }}"
       exit 1
     shell: bash
 
   - name: "EAB - 07b - Enroll lego - challenge validations fails"
-    id: legofail04
+    id: legofail07
     continue-on-error: true
     run: |
       sudo rm -rf lego/*
@@ -254,8 +254,8 @@ runs:
     shell: bash
 
   - name: "EAB - 07b - check  result "
-    if: steps.legofail04.outcome != 'failure'
+    if: steps.legofail07.outcome != 'failure'
     run: |
-      echo "legofail outcome is ${{steps.legofail04.outcome }}"
+      echo "legofail outcome is ${{steps.legofail07.outcome }}"
       exit 1
     shell: bash
